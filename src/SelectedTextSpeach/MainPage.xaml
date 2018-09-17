@@ -23,6 +23,8 @@
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Button x:Name="inputTextReadButton" Content="Read" Margin="10" Click="InputTextBoxReadButton_Click"/>
                 <Button x:Name="inputTextStopButton" Content="Stop" Margin="10" Click="InputTextBoxStopButton_Click"/>
+                <Button x:Name="inputTextPauseButton" Content="Pause" Margin="10" Click="InputTextBoxPauseButton_Click"/>
+                <Button x:Name="inputTextResumeButton" Content="Resume" Margin="10" Click="InputTextBoxResumeButton_Click"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
@@ -32,6 +34,8 @@
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Button x:Name="selectedTextReadButton" Content="Read" Margin="10" Click="SelectedTextBoxReadButton_Click"/>
                 <Button x:Name="selectedTextStopButton" Content="Stop" Margin="10" Click="SelectedTextBoxStopButton_Click"/>
+                <Button x:Name="selectedTextPauseButton" Content="Pause" Margin="10" Click="SelectedTextBoxPauseButton_Click"/>
+                <Button x:Name="selectedTextResumeButton" Content="Resume" Margin="10" Click="SelectedTextBoxResumeButton_Click"/>
             </StackPanel>
         </StackPanel>
         <TextBlock x:Name="label1" HorizontalAlignment="Center"/>

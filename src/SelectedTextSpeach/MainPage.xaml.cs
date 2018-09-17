@@ -33,10 +33,17 @@ namespace HelloWorld
                 TextBoxInputReader.StartReadContent();
             }
         }
-
         private void InputTextBoxStopButton_Click(object sender, RoutedEventArgs e)
         {
             TextBoxInputReader.StopReadContent();
+        }
+        private void InputTextBoxPauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextBoxInputReader.PauseReadContent();
+        }
+        private void InputTextBoxResumeButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextBoxInputReader.ResumeReadContent();
         }
 
         private async void SelectedTextBoxReadButton_Click(object sender, RoutedEventArgs e)
@@ -48,10 +55,17 @@ namespace HelloWorld
             }
             TextBoxSelectionReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
         }
-
         private void SelectedTextBoxStopButton_Click(object sender, RoutedEventArgs e)
         {
             TextBoxSelectionReader.StopReadContent();
+        }
+        private void SelectedTextBoxPauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextBoxSelectionReader.PauseReadContent();
+        }
+        private void SelectedTextBoxResumeButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextBoxSelectionReader.ResumeReadContent();
         }
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)
