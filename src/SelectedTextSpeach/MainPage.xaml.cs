@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -14,6 +12,8 @@ namespace HelloWorld
     public sealed partial class MainPage : Page
     {
         private readonly ConcurrentDictionary<string, MediaElement> playerDictionary = new ConcurrentDictionary<string, MediaElement>();
+        private readonly SpeechTextBox TextBoxInput;
+        private readonly SpeechTextBox TextBoxSelection;
 
         public MainPage()
         {
@@ -23,32 +23,20 @@ namespace HelloWorld
                 var resourceLoader = ResourceLoaderHelpers.SafeGetForCurrentViewAsync(this).Result;
                 textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.InitialInputTextBoxResource);
             }
+
+            TextBoxInput = new SpeechTextBox(textBoxInput);
+            TextBoxSelection = new SpeechTextBox(selectedTextBox);
         }
 
         private async void TextBoxInputButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
-            {
-                if (!playerDictionary.TryGetValue(nameof(TextBoxInputButton_Click), out var mediaElement))
-                {
-                    mediaElement = new MediaElement();
-                    playerDictionary.TryAdd(nameof(TextBoxInputButton_Click), mediaElement);
-                }
-                await ReadContent(mediaElement, textBoxInput.Text);
-            }
+            await TextBoxInput.OnButtonClickAsync();
         }
 
         private async void TextBoxSelectedButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
-            {
-                if (!playerDictionary.TryGetValue(nameof(TextBoxSelectedButton_Click), out var mediaElement))
-                {
-                    mediaElement = new MediaElement();
-                    playerDictionary.TryAdd(nameof(TextBoxSelectedButton_Click), mediaElement);
-                }
-                await ReadContent(mediaElement, selectedTextBox.Text);
-            }
+            TextBoxSelection.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
+            await TextBoxSelection.OnButtonClickAsync();
         }
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)
@@ -56,27 +44,6 @@ namespace HelloWorld
             selectedTextBox.Text = textBoxInput.SelectedText;
             label1.Text = "Selection length is " + textBoxInput.SelectionLength.ToString();
             label2.Text = "Selection starts at " + textBoxInput.SelectionStart.ToString();
-        }
-
-        private async Task ReadContent(MediaElement mediaElement, string content)
-        {
-            var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
-            Windows.Media.SpeechSynthesis.SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync(content);
-            mediaElement.SetSource(stream, stream.ContentType);
-            mediaElement.SeekCompleted += (obj, player) =>
-            {
-                // Change Media Element Status to completed
-            };
-            mediaElement.Play();
-        }
-
-        private async Task StopReadContent(string content)
-        {
-            var mediaElement = new MediaElement();
-            var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
-            Windows.Media.SpeechSynthesis.SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync(content);
-            mediaElement.SetSource(stream, stream.ContentType);
-            mediaElement.Play();
         }
     }
 }
