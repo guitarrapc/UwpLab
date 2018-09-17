@@ -10,12 +10,16 @@
 
     <StackPanel HorizontalAlignment="Center">
         <!-- TODO: Provide Selection of Harry Potter's sentence -->
+        <!-- TODO: Provide Dictionary Function -->
+        <!-- TODO: Provide Login Functionalilty -->
+        <!-- TODO: Provide Blob View Functionality -->
+        <!-- TODO: Provide Blob Selection Functionality -->
         <StackPanel x:Name="inputTextStackPanel" Orientation="Horizontal">
             <TextBox x:Name="textBoxInput" Height="200" Width="300" Margin="10"
-                 AcceptsReturn="True" TextWrapping="Wrap"
-                 Header="Input your note" Text="October arrived, spreading a damp chill over the grounds and into the castle. Madam Pomfrey, the nurse, was kept busy by a sudden spate of colds among the staff and students. Her Pepperup potion worked instantly, though it left the drinker smoking at the ears for several hours afterward. Ginny Weasley, who had been looking pale, was bullied into taking some by Percy. The steam pouring from under her vivid hair gave the impression that her whole head was on fire."
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 SelectionChanged="TextBoxInput_SelectionChanged" />
+                    AcceptsReturn="True" TextWrapping="Wrap"
+                    Header="Input your note"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    SelectionChanged="TextBoxInput_SelectionChanged" />
             <Button x:Name="inputButton" Content="Read Content" Margin="10" Click="TextBoxInputButton_Click"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">

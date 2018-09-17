@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,16 +13,28 @@ namespace HelloWorld
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private readonly ConcurrentDictionary<string, MediaElement> playerDictionary = new ConcurrentDictionary<string, MediaElement>();
+
         public MainPage()
         {
             InitializeComponent();
+            if (string.IsNullOrWhiteSpace(textBoxInput.Text))
+            {
+                var resourceLoader = ResourceLoaderHelpers.SafeGetForCurrentViewAsync(this).Result;
+                textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.InitialInputTextBoxResource);
+            }
         }
 
         private async void TextBoxInputButton_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
             {
-                await ReadContent(textBoxInput.Text);
+                if (!playerDictionary.TryGetValue(nameof(TextBoxInputButton_Click), out var mediaElement))
+                {
+                    mediaElement = new MediaElement();
+                    playerDictionary.TryAdd(nameof(TextBoxInputButton_Click), mediaElement);
+                }
+                await ReadContent(mediaElement, textBoxInput.Text);
             }
         }
 
@@ -29,7 +42,12 @@ namespace HelloWorld
         {
             if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
             {
-                await ReadContent(selectedTextBox.Text);
+                if (!playerDictionary.TryGetValue(nameof(TextBoxSelectedButton_Click), out var mediaElement))
+                {
+                    mediaElement = new MediaElement();
+                    playerDictionary.TryAdd(nameof(TextBoxSelectedButton_Click), mediaElement);
+                }
+                await ReadContent(mediaElement, selectedTextBox.Text);
             }
         }
 
@@ -40,7 +58,19 @@ namespace HelloWorld
             label2.Text = "Selection starts at " + textBoxInput.SelectionStart.ToString();
         }
 
-        private async Task ReadContent(string content)
+        private async Task ReadContent(MediaElement mediaElement, string content)
+        {
+            var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+            Windows.Media.SpeechSynthesis.SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync(content);
+            mediaElement.SetSource(stream, stream.ContentType);
+            mediaElement.SeekCompleted += (obj, player) =>
+            {
+                // Change Media Element Status to completed
+            };
+            mediaElement.Play();
+        }
+
+        private async Task StopReadContent(string content)
         {
             var mediaElement = new MediaElement();
             var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
