@@ -4,9 +4,10 @@ using Windows.ApplicationModel.Resources;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
-namespace HelloWorld
+namespace SelectedTextSpeach
 {
-    public static class ResourceLoaderHelpers
+    // About String Resources : https://docs.microsoft.com/ja-jp/windows/uwp/app-resources/localize-strings-ui-manifest
+    public static class StringsResourcesHelpers
     {
         public static async Task<ResourceLoader> SafeGetForCurrentViewAsync(Page page)
         {

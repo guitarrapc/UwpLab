@@ -1,4 +1,4 @@
-namespace HelloWorld
+namespace SelectedTextSpeach
 {
     public static class ApplicationSettings
     {

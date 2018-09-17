@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace HelloWorld
+namespace SelectedTextSpeach
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -20,7 +20,7 @@ namespace HelloWorld
             InitializeComponent();
             if (string.IsNullOrWhiteSpace(textBoxInput.Text))
             {
-                var resourceLoader = ResourceLoaderHelpers.SafeGetForCurrentViewAsync(this).Result;
+                var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync(this).Result;
                 textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.InitialInputTextBoxResource);
             }
         }
@@ -48,9 +48,9 @@ namespace HelloWorld
 
         private async void SelectedTextBoxReadButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
+            if (!string.IsNullOrWhiteSpace(textBoxSelected.Text))
             {
-                await TextBoxSelectionReader.SetContent(textBoxInput.Text);
+                await TextBoxSelectionReader.SetContent(textBoxSelected.Text);
                 TextBoxSelectionReader.StartReadContent();
             }
             TextBoxSelectionReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
@@ -70,7 +70,7 @@ namespace HelloWorld
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            selectedTextBox.Text = textBoxInput.SelectedText;
+            textBoxSelected.Text = textBoxInput.SelectedText;
             label1.Text = "Selection length is " + textBoxInput.SelectionLength.ToString();
             label2.Text = "Selection starts at " + textBoxInput.SelectionStart.ToString();
         }

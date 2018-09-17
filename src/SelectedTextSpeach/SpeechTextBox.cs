@@ -5,7 +5,7 @@ using Windows.Media.SpeechSynthesis;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace HelloWorld
+namespace SelectedTextSpeach
 {
     public interface IContentReader
     {
