@@ -12,8 +12,8 @@ namespace HelloWorld
     public sealed partial class MainPage : Page
     {
         private readonly ConcurrentDictionary<string, MediaElement> playerDictionary = new ConcurrentDictionary<string, MediaElement>();
-        private readonly SpeechTextBox TextBoxInput;
-        private readonly SpeechTextBox TextBoxSelection;
+        private readonly IContentReader TextBoxInputReader = new ContentReader();
+        private readonly IContentReader TextBoxSelectionReader = new ContentReader();
 
         public MainPage()
         {
@@ -23,20 +23,35 @@ namespace HelloWorld
                 var resourceLoader = ResourceLoaderHelpers.SafeGetForCurrentViewAsync(this).Result;
                 textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.InitialInputTextBoxResource);
             }
-
-            TextBoxInput = new SpeechTextBox(textBoxInput);
-            TextBoxSelection = new SpeechTextBox(selectedTextBox);
         }
 
-        private async void TextBoxInputButton_Click(object sender, RoutedEventArgs e)
+        private async void InputTextBoxReadButton_Click(object sender, RoutedEventArgs e)
         {
-            await TextBoxInput.OnButtonClickAsync();
+            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
+            {
+                await TextBoxInputReader.SetContent(textBoxInput.Text);
+                TextBoxInputReader.StartReadContent();
+            }
         }
 
-        private async void TextBoxSelectedButton_Click(object sender, RoutedEventArgs e)
+        private void InputTextBoxStopButton_Click(object sender, RoutedEventArgs e)
         {
-            TextBoxSelection.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
-            await TextBoxSelection.OnButtonClickAsync();
+            TextBoxInputReader.StopReadContent();
+        }
+
+        private async void SelectedTextBoxReadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
+            {
+                await TextBoxSelectionReader.SetContent(textBoxInput.Text);
+                TextBoxSelectionReader.StartReadContent();
+            }
+            TextBoxSelectionReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
+        }
+
+        private void SelectedTextBoxStopButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextBoxSelectionReader.StopReadContent();
         }
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)

@@ -20,13 +20,19 @@
                     Header="Input your note"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     SelectionChanged="TextBoxInput_SelectionChanged" />
-            <Button x:Name="inputButton" Content="Read Content" Margin="10" Click="TextBoxInputButton_Click"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button x:Name="inputTextReadButton" Content="Read" Margin="10" Click="InputTextBoxReadButton_Click"/>
+                <Button x:Name="inputTextStopButton" Content="Stop" Margin="10" Click="InputTextBoxStopButton_Click"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="selectedTextBox" Height="200" Width="300" Margin="10"
                      Header="Your selected text"
                      TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True"/>
-            <Button x:Name="selectedButton" Content="Read Content" Margin="10" Click="TextBoxSelectedButton_Click"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button x:Name="selectedTextReadButton" Content="Read" Margin="10" Click="SelectedTextBoxReadButton_Click"/>
+                <Button x:Name="selectedTextStopButton" Content="Stop" Margin="10" Click="SelectedTextBoxStopButton_Click"/>
+            </StackPanel>
         </StackPanel>
         <TextBlock x:Name="label1" HorizontalAlignment="Center"/>
         <TextBlock x:Name="label2" HorizontalAlignment="Center"/>

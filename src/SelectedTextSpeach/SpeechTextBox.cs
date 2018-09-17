@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.SpeechSynthesis;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -10,42 +9,29 @@ namespace HelloWorld
 {
     public interface IContentReader
     {
-        void SetVoice(VoiceGender gender, string language);
-        Task<(IRandomAccessStream stream, string contentType)> SetContent(string content);
-        void StartReadContent(IRandomAccessStream stream, string contentType, Action<object, RoutedEventArgs> seekCompletedAction);
+        Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
+
+        void SetVoice(VoiceGender gender);
+        Task SetContent(string content);
+        void StartReadContent();
         void StopReadContent();
         void PauseReadContent();
         void ResumeReadContent();
     }
 
-    public class SpeechTextBox : IContentReader
+
+    public class ContentReader : IContentReader
     {
-        public TextBox TextBoxItem { get; set; }
-        public MediaElement MediaElementItem { get; set; }
-
+        private readonly MediaElement MediaElementItem = new MediaElement();
         private VoiceInformation voice = null;
+        public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
 
-        public SpeechTextBox(TextBox textBox)
-        {
-            TextBoxItem = textBox;
-            MediaElementItem = new MediaElement();
-        }
-
-        public async Task OnButtonClickAsync(Action<object, RoutedEventArgs> seekCompletedAction = null)
-        {
-            if (!string.IsNullOrWhiteSpace(TextBoxItem.Text))
-            {
-                (IRandomAccessStream stream, string contentType) stream = await SetContent(TextBoxItem.Text);
-                StartReadContent(stream.stream, stream.contentType, seekCompletedAction);
-            }
-        }
-
-        public void SetVoice(VoiceGender gender, string language = "en-US")
+        public void SetVoice(VoiceGender gender)
         {
             voice = SpeechSynthesizer.AllVoices.Where(x => x.Gender == gender).First();
         }
 
-        public async Task<(IRandomAccessStream stream, string contentType)> SetContent(string content)
+        public async Task SetContent(string content)
         {
             using (var synth = new SpeechSynthesizer())
             {
@@ -54,17 +40,15 @@ namespace HelloWorld
                     synth.Voice = voice;
                 }
                 var stream = await synth.SynthesizeTextToStreamAsync(content);
-                return (stream, stream.ContentType);
+                MediaElementItem.SetSource(stream, stream.ContentType);
             }
         }
 
-        public void StartReadContent(IRandomAccessStream stream, string contentType, Action<object, RoutedEventArgs> seekCompletedAction)
+        public void StartReadContent()
         {
-            MediaElementItem.SetSource(stream, contentType);
             MediaElementItem.SeekCompleted += (obj, player) =>
             {
-                //TODO: Change Media Element Status to completed
-                seekCompletedAction?.Invoke(obj, player);
+                SeekCompletedAction?.Invoke(obj, player);
             };
             MediaElementItem.Play();
         }
@@ -89,7 +73,7 @@ namespace HelloWorld
         {
             if (MediaElementItem.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Paused)
             {
-                MediaElementItem.Play();
+                StartReadContent();
             }
         }
     }
