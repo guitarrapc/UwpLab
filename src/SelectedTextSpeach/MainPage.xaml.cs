@@ -25,47 +25,49 @@ namespace SelectedTextSpeach
             }
         }
 
-        private async void InputTextBoxReadButton_Click(object sender, RoutedEventArgs e)
+        private async void InputTextBoxPlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
+            if (TextBoxInputReader.IsPlaying)
+            {
+                TextBoxInputReader.PauseReadContent();
+            }
+            else if (TextBoxInputReader.IsPaused)
+            {
+                TextBoxInputReader.StartReadContent();
+            }
+            else if (!string.IsNullOrWhiteSpace(textBoxInput.Text))
             {
                 await TextBoxInputReader.SetContent(textBoxInput.Text);
                 TextBoxInputReader.StartReadContent();
             }
+            inputTextReadButton.Content = TextBoxInputReader.CurrentIconContent;
         }
         private void InputTextBoxStopButton_Click(object sender, RoutedEventArgs e)
         {
             TextBoxInputReader.StopReadContent();
-        }
-        private void InputTextBoxPauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextBoxInputReader.PauseReadContent();
-        }
-        private void InputTextBoxResumeButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextBoxInputReader.ResumeReadContent();
+            inputTextReadButton.Content = TextBoxInputReader.CurrentIconContent;
         }
 
-        private async void SelectedTextBoxReadButton_Click(object sender, RoutedEventArgs e)
+        private async void SelectedTextBoxPlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textBoxSelected.Text))
+            if (TextBoxSelectionReader.IsPlaying)
+            {
+                TextBoxSelectionReader.PauseReadContent();
+            }
+            else if (TextBoxSelectionReader.IsPaused)
+            {
+                TextBoxSelectionReader.StartReadContent();
+            }
+            else if (!string.IsNullOrWhiteSpace(textBoxSelected.Text))
             {
                 await TextBoxSelectionReader.SetContent(textBoxSelected.Text);
                 TextBoxSelectionReader.StartReadContent();
             }
-            TextBoxSelectionReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
+            selectedTextReadButton.Content = TextBoxSelectionReader.CurrentIconContent;
         }
         private void SelectedTextBoxStopButton_Click(object sender, RoutedEventArgs e)
         {
             TextBoxSelectionReader.StopReadContent();
-        }
-        private void SelectedTextBoxPauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextBoxSelectionReader.PauseReadContent();
-        }
-        private void SelectedTextBoxResumeButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextBoxSelectionReader.ResumeReadContent();
         }
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)

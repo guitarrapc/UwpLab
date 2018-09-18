@@ -4,27 +4,39 @@ using System.Threading.Tasks;
 using Windows.Media.SpeechSynthesis;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace SelectedTextSpeach
 {
     public interface IContentReader
     {
         Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
+        bool IsPlaying { get; }
+        bool IsPaused { get; }
+        bool IsStopped { get; }
+        string CurrentIconContent { get; }
 
         void SetVoice(VoiceGender gender);
         Task SetContent(string content);
         void StartReadContent();
         void StopReadContent();
         void PauseReadContent();
-        void ResumeReadContent();
     }
 
 
     public class ContentReader : IContentReader
     {
+        private static readonly string playIcon = "\xE768";
+        private static readonly string pauseIcon = "\xE769";
+
+        public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
+        public bool IsPlaying => MediaElementItem.CurrentState == MediaElementState.Playing;
+        public bool IsPaused => MediaElementItem.CurrentState == MediaElementState.Paused;
+        public bool IsStopped => MediaElementItem.CurrentState == MediaElementState.Stopped;
+        public string CurrentIconContent { get; private set; } = playIcon;
+
         private readonly MediaElement MediaElementItem = new MediaElement();
         private VoiceInformation voice = null;
-        public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
 
         public void SetVoice(VoiceGender gender)
         {
@@ -46,34 +58,37 @@ namespace SelectedTextSpeach
 
         public void StartReadContent()
         {
-            MediaElementItem.SeekCompleted += (obj, player) =>
+            if (MediaElementItem.CurrentState == MediaElementState.Paused)
             {
-                SeekCompletedAction?.Invoke(obj, player);
-            };
-            MediaElementItem.Play();
+                MediaElementItem.Play();
+            }
+            else
+            {
+                //TODO: Auto Play's end should change button text to PlayIcon
+                MediaElementItem.SeekCompleted += (obj, player) =>
+                {
+                    SeekCompletedAction?.Invoke(obj, player);
+                };
+                MediaElementItem.Play();
+            }
+            CurrentIconContent = pauseIcon;
         }
 
         public void StopReadContent()
         {
-            if (MediaElementItem.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
+            if (MediaElementItem.CurrentState == MediaElementState.Playing)
             {
                 MediaElementItem.Stop();
+                CurrentIconContent = playIcon;
             }
         }
 
         public void PauseReadContent()
         {
-            if (MediaElementItem.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && MediaElementItem.CanPause)
+            if (MediaElementItem.CurrentState == MediaElementState.Playing && MediaElementItem.CanPause)
             {
                 MediaElementItem.Pause();
-            }
-        }
-
-        public void ResumeReadContent()
-        {
-            if (MediaElementItem.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Paused)
-            {
-                StartReadContent();
+                CurrentIconContent = playIcon;
             }
         }
     }
