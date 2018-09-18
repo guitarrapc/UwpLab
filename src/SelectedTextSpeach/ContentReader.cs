@@ -11,6 +11,7 @@ namespace SelectedTextSpeach
     public interface IContentReader
     {
         Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
+        string CurrentContent { get; }
         bool IsPlaying { get; }
         bool IsPaused { get; }
         bool IsStopped { get; }
@@ -30,6 +31,7 @@ namespace SelectedTextSpeach
         private static readonly string pauseIcon = "\xE769";
 
         public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
+        public string CurrentContent { get; private set; }
         public bool IsPlaying => MediaElementItem.CurrentState == MediaElementState.Playing;
         public bool IsPaused => MediaElementItem.CurrentState == MediaElementState.Paused;
         public bool IsStopped => MediaElementItem.CurrentState == MediaElementState.Stopped;
@@ -45,6 +47,7 @@ namespace SelectedTextSpeach
 
         public async Task SetContent(string content)
         {
+            CurrentContent = content;
             using (var synth = new SpeechSynthesizer())
             {
                 if (voice != null)
@@ -76,7 +79,7 @@ namespace SelectedTextSpeach
 
         public void StopReadContent()
         {
-            if (MediaElementItem.CurrentState == MediaElementState.Playing)
+            if (MediaElementItem.CurrentState != MediaElementState.Stopped)
             {
                 MediaElementItem.Stop();
                 CurrentIconContent = playIcon;

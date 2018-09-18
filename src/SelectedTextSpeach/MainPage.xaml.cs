@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -12,16 +14,30 @@ namespace SelectedTextSpeach
     public sealed partial class MainPage : Page
     {
         private readonly ConcurrentDictionary<string, MediaElement> playerDictionary = new ConcurrentDictionary<string, MediaElement>();
+        private readonly static Dictionary<int, string> StoryTextReferences = new Dictionary<int, string>();
         private readonly IContentReader TextBoxInputReader = new ContentReader();
         private readonly IContentReader TextBoxSelectionReader = new ContentReader();
 
         public MainPage()
         {
             InitializeComponent();
-            if (string.IsNullOrWhiteSpace(textBoxInput.Text))
+            // Initial Text Box
+            var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync(this).Result;
+            textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.StoryTextResources.First().Value);
+
+            // List Item to select
+            foreach (var story in ApplicationSettings.StoryTextResources)
             {
-                var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync(this).Result;
-                textBoxInput.Text = resourceLoader.GetString(ApplicationSettings.InitialInputTextBoxResource);
+                var content = resourceLoader.GetString(story.Key);
+                StoryTextReferences.Add(content.GetHashCode(), story.Key);
+                storyListView.Items.Add(content);
+                storyListView.IsItemClickEnabled = true;
+                storyListView.ItemClick += (object sender, ItemClickEventArgs e) =>
+                {
+                    // Change Text Box's text
+                    var newStory = resourceLoader.GetString(ApplicationSettings.StoryTextResources[StoryTextReferences[e.ClickedItem.GetHashCode()]]);
+                    textBoxInput.Text = newStory;
+                };
             }
         }
 
