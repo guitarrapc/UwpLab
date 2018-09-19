@@ -31,8 +31,7 @@ namespace SelectedTextSpeach
 
         private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var newStory = ViewModel.GetStory(storyListView.SelectedItem.ToString().GetHashCode());
-            textBoxInput.Text = newStory.Content;
+            ViewModel.StorySelectionChanged(storyListView.SelectedItem.ToString().GetHashCode());
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)

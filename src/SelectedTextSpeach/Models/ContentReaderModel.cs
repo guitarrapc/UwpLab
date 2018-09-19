@@ -1,8 +1,6 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Reactive.Bindings;
 using Windows.Media.SpeechSynthesis;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -21,7 +19,6 @@ namespace SelectedTextSpeach.Models
         bool IsPlaying { get; }
         bool IsPaused { get; }
         bool IsStopped { get; }
-        ReactiveProperty<string> PlayIcon { get; }
 
         void SetLanguage(SpeechLanugage language);
         void SetVoice(VoiceGender gender);
@@ -32,20 +29,12 @@ namespace SelectedTextSpeach.Models
     }
 
 
-    public class ContentReaderModel : IContentReader, INotifyPropertyChanged
+    public class ContentReaderModel : IContentReader
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        //private static readonly string playIcon = "\xE768";
-        //private static readonly string pauseIcon = "\xE769";
-        private static readonly string playIcon = "123";
-        private static readonly string pauseIcon = "098";
-
         public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
         public bool IsPlaying => MediaElementItem.CurrentState == MediaElementState.Playing;
         public bool IsPaused => MediaElementItem.CurrentState == MediaElementState.Paused;
         public bool IsStopped => MediaElementItem.CurrentState == MediaElementState.Stopped;
-        public ReactiveProperty<string> PlayIcon { get; } = new ReactiveProperty<string>(playIcon);
 
         private readonly MediaElement MediaElementItem = new MediaElement();
         private VoiceInformation voice = null;
@@ -111,7 +100,6 @@ namespace SelectedTextSpeach.Models
                 };
                 MediaElementItem.Play();
             }
-            PlayIcon.Value = pauseIcon;
         }
 
         public void StopReadContent()
@@ -119,7 +107,6 @@ namespace SelectedTextSpeach.Models
             if (MediaElementItem.CurrentState != MediaElementState.Stopped)
             {
                 MediaElementItem.Stop();
-                PlayIcon.Value = playIcon;
             }
         }
 
@@ -128,7 +115,6 @@ namespace SelectedTextSpeach.Models
             if (MediaElementItem.CurrentState == MediaElementState.Playing && MediaElementItem.CanPause)
             {
                 MediaElementItem.Pause();
-                PlayIcon.Value = playIcon;
             }
         }
     }

@@ -14,11 +14,11 @@
             <TextBox x:Name="textBoxInput" Height="200" Width="300" Margin="10"
                     AcceptsReturn="True" TextWrapping="Wrap"
                     Header="Input your note"
-                    Text="{x:Bind ViewModel.InputTextBox.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{x:Bind ViewModel.TextBoxInput.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     SelectionChanged="TextBoxInput_SelectionChanged" />
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="inputTextReadButton" Margin="10" Content="{x:Bind ViewModel.PlayIcon.Value, Mode=TwoWay}" Background="Transparent"
+                <Button x:Name="inputTextReadButton" Margin="10" Content="{x:Bind ViewModel.PlayIcon.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
                         Click="{x:Bind ViewModel.ReadInputBox}" />
                 <Button x:Name="inputTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopInputBox}">

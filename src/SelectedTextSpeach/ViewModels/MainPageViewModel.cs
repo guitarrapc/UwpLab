@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -12,19 +13,24 @@ using Windows.UI.Popups;
 
 namespace SelectedTextSpeach.ViewModels
 {
-    internal class MainPageViewModel : IDisposable
+    public class MainPageViewModel : IDisposable, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ReactiveProperty<string> Input { get; }
         public ReadOnlyReactiveProperty<string> Output { get; }
         public Person SelectedItem { get; set; }
-        public ReactiveProperty<string> InputTextBox { get; }
-        public ReactiveProperty<string> PlayIcon { get; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> TextBoxInput { get; }
+        public ReactiveProperty<string> PlayIcon { get; }
         public Story[] ListViewItemStory { get; }
 
         private readonly StoryModel storyModel = new StoryModel();
         private readonly ContentReaderModel contentReaderModel = new ContentReaderModel();
         private readonly ContentReaderModel TextBoxInputReader = new ContentReaderModel();
         private CompositeDisposable disposable = new CompositeDisposable();
+
+        private static readonly string playIcon = "\xE768";
+        private static readonly string pauseIcon = "\xE769";
 
         public MainPageViewModel()
         {
@@ -34,13 +40,8 @@ namespace SelectedTextSpeach.ViewModels
                 .Select(x => x.ToUpper())
                 .ToReadOnlyReactiveProperty();
 
-            InputTextBox = new ReactiveProperty<string>(storyModel.FirstOrDefailt()?.Content);
-            contentReaderModel.PlayIcon.Select(x => x.ToString()).Subscribe(x =>
-            {
-                PlayIcon.Value = x;
-                System.Diagnostics.Debug.WriteLine($"model : {x}");
-            }).AddTo(disposable);
-            PlayIcon.Subscribe(x => System.Diagnostics.Debug.WriteLine(x)).AddTo(disposable);
+            TextBoxInput = new ReactiveProperty<string>(storyModel.FirstOrDefailt()?.Content);
+            PlayIcon = new ReactiveProperty<string>(playIcon);
             ListViewItemStory = storyModel.All();
         }
 
@@ -51,9 +52,10 @@ namespace SelectedTextSpeach.ViewModels
             await dlg.ShowAsync();
         }
 
-        public Story GetStory(int titleHash)
+        public void StorySelectionChanged(int titleHash)
         {
-            return storyModel.Get(titleHash);
+            var story = storyModel.Get(titleHash);
+            TextBoxInput.Value = story.Content;
         }
 
         public async Task ReadInputBox()
@@ -61,21 +63,25 @@ namespace SelectedTextSpeach.ViewModels
             if (TextBoxInputReader.IsPlaying)
             {
                 TextBoxInputReader.PauseReadContent();
+                PlayIcon.Value = playIcon;
             }
             else if (TextBoxInputReader.IsPaused)
             {
                 TextBoxInputReader.StartReadContent();
+                PlayIcon.Value = pauseIcon;
             }
-            else if (!string.IsNullOrWhiteSpace(InputTextBox.Value))
+            else if (!string.IsNullOrWhiteSpace(TextBoxInput.Value))
             {
-                await TextBoxInputReader.SetContent(InputTextBox.Value);
+                await TextBoxInputReader.SetContent(TextBoxInput.Value);
                 TextBoxInputReader.StartReadContent();
+                PlayIcon.Value = pauseIcon;
             }
         }
 
         public void StopInputBox()
         {
             TextBoxInputReader.StopReadContent();
+            PlayIcon.Value = playIcon;
         }
 
         public void Dispose()

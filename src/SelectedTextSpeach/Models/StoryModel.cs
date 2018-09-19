@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Reactive.Bindings;
 using SelectedTextSpeach.Data.Entities;
 
 namespace SelectedTextSpeach.Data.Models
@@ -18,8 +17,6 @@ namespace SelectedTextSpeach.Data.Models
     }
     public class StoryModel : IStoryRepository
     {
-        public ReactiveProperty<Story> CurrentStory { get; set; }
-
         private readonly List<Story> stories = new List<Story>();
         private ConcurrentDictionary<int, string> StoryTitleReference { get; } = new ConcurrentDictionary<int, string>();
 
