@@ -1,78 +1,47 @@
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
+using Reactive.Bindings;
 using SelectedTextSpeach.Data.Entities;
+using SelectedTextSpeach.Data.Models.Repositories;
 
 namespace SelectedTextSpeach.Data.Models
 {
-    public interface IStoryRepository
+    public interface IStoryModel
     {
-        Story Get(int key);
-        Story Get(string title);
-        Story[] All();
-        void Remove(int key);
-        void Remove(string title);
-        void Clear();
-
+        Story InitialStory { get; }
+        ReactivePropertySlim<Story> CurrentStory { get; }
+        Story[] AllStories { get; }
+        void ChangeCurrentStoryByTitleHash(int titleHash);
     }
-    public class StoryModel : IStoryRepository
+
+    public class HarryPotterStoryModel : IStoryModel
     {
-        private readonly List<Story> stories = new List<Story>();
-        private ConcurrentDictionary<int, string> StoryTitleReference { get; } = new ConcurrentDictionary<int, string>();
+        private readonly IStoryRepository repository;
+        public Story InitialStory { get; }
+        public ReactivePropertySlim<Story> CurrentStory { get; }
+        public Story[] AllStories { get; }
 
-        public StoryModel()
+        public HarryPotterStoryModel()
         {
+
+            repository = new StoryRepostiory();
             var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync().Result;
-            foreach (var (order, titleKey, contentKey) in ApplicationSettings.StoryTextResourceMatching)
+            foreach (var (order, titleKey, contentKey) in ApplicationSettings.HarryPotterStoryTextResources)
             {
-                stories.Add(new Story(resourceLoader.GetString(titleKey), resourceLoader.GetString(contentKey)));
-                // Create reference by Story Title
-                var title = resourceLoader.GetString(titleKey);
-                StoryTitleReference.TryAdd(title.GetHashCode(), resourceLoader.GetString(titleKey));
+                repository.Add(resourceLoader.GetString(titleKey), resourceLoader.GetString(contentKey));
             }
-        }
+            AllStories = repository.All();
+            InitialStory = AllStories.FirstOrDefault();
 
-        public Story Get(int key)
-        {
-            var title = StoryTitleReference[key];
-            return Get(title);
-        }
-
-        public Story Get(string title)
-        {
-            return stories.FirstOrDefault(x => x.Title == title);
-        }
-
-        public Story[] All()
-        {
-            return stories.ToArray();
-        }
-
-        public Story FirstOrDefailt(Story storyDefault = null)
-        {
-            var result = stories.FirstOrDefault();
-            if (result == null)
+            CurrentStory = new ReactivePropertySlim<Story>
             {
-                return storyDefault;
-            }
-            return result;
+                Value = InitialStory
+            };
         }
 
-        public void Remove(int key)
+        public void ChangeCurrentStoryByTitleHash(int titleHash)
         {
-            var title = StoryTitleReference[key];
-            Remove(title);
-        }
-
-        public void Remove(string title)
-        {
-            var index = stories.FindIndex(0, 1, x => x.Title == title);
-            stories.RemoveAt(index);
-        }
-
-        public void Clear()
-        {
-            stories.Clear();
+            var current = repository.Get(titleHash);
+            CurrentStory.Value = current;
         }
     }
 }

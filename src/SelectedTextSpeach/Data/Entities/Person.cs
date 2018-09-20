@@ -1,4 +1,4 @@
-namespace SelectedTextSpeach.Models
+namespace SelectedTextSpeach.Data.Entities
 {
     public class Person
     {

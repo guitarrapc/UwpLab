@@ -96,13 +96,14 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ApplicationSettings.cs" />
+    <Compile Include="Models\Repositories\StoryRepository.cs" />
     <Compile Include="Models\StoryModel.cs" />
     <Compile Include="Data\Entities\Story.cs" />
     <Compile Include="Helpers\StringsResourcesHelpers.cs" />
-    <Compile Include="MainPage.xaml.cs">
+    <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Person.cs" />
+    <Compile Include="Data\Entities\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ContentReaderModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
@@ -128,7 +129,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainPage.xaml">
+    <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

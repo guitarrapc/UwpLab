@@ -24,7 +24,7 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveProperty<string> PlayIcon { get; }
         public Story[] ListViewItemStory { get; }
 
-        private readonly StoryModel storyModel = new StoryModel();
+        private readonly IStoryModel storyModel = new HarryPotterStoryModel();
         private readonly ContentReaderModel contentReaderModel = new ContentReaderModel();
         private readonly ContentReaderModel TextBoxInputReader = new ContentReaderModel();
         private CompositeDisposable disposable = new CompositeDisposable();
@@ -40,9 +40,11 @@ namespace SelectedTextSpeach.ViewModels
                 .Select(x => x.ToUpper())
                 .ToReadOnlyReactiveProperty();
 
-            TextBoxInput = new ReactiveProperty<string>(storyModel.FirstOrDefailt()?.Content);
+            TextBoxInput = new ReactiveProperty<string>(storyModel.InitialStory.Content);
             PlayIcon = new ReactiveProperty<string>(playIcon);
-            ListViewItemStory = storyModel.All();
+            ListViewItemStory = storyModel.AllStories;
+
+            storyModel.CurrentStory.Subscribe(x => TextBoxInput.Value = x.Content).AddTo(disposable);
         }
 
         public async void Dump()
@@ -54,8 +56,7 @@ namespace SelectedTextSpeach.ViewModels
 
         public void StorySelectionChanged(int titleHash)
         {
-            var story = storyModel.Get(titleHash);
-            TextBoxInput.Value = story.Content;
+            storyModel.ChangeCurrentStoryByTitleHash(titleHash);
         }
 
         public async Task ReadInputBox()

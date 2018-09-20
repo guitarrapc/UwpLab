@@ -72,8 +72,6 @@ namespace SelectedTextSpeach.Models
         public async Task SetContent(string content)
         {
             var resourceLoader = await StringsResourcesHelpers.SafeGetForCurrentViewAsync();
-            var hoge = resourceLoader.GetString(ApplicationSettings.StoryTextResourceMatching.First().Value);
-
             using (var synth = new SpeechSynthesizer())
             {
                 if (voice != null)

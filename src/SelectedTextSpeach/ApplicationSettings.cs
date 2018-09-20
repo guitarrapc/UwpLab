@@ -4,7 +4,7 @@ namespace SelectedTextSpeach
 {
     public static class ApplicationSettings
     {
-        public static List<(int order, string Key, string Value)> StoryTextResourceMatching => new List<(int, string, string)>{
+        public static List<(int order, string Key, string Value)> HarryPotterStoryTextResources => new List<(int, string, string)>{
             ( 0, "HarrySorcererStoneCharter2SentenceTitle1/Text", "HarrySorcererStoneCharter2Sentence1/Text"),
             ( 1, "HarrySorcererStoneCharter2SentenceTitle2/Text", "HarrySorcererStoneCharter2Sentence2/Text"),
             ( 2, "HarrySorcererStoneCharter2SentenceTitle3/Text", "HarrySorcererStoneCharter2Sentence3/Text"),
