@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Linq;
 using Reactive.Bindings;
 using SelectedTextSpeach.Data.Entities;
@@ -9,8 +10,8 @@ namespace SelectedTextSpeach.Data.Models
     {
         Story InitialStory { get; }
         ReactivePropertySlim<Story> CurrentStory { get; }
-        Story[] AllStories { get; }
-        void ChangeCurrentStoryByTitle(StoryTitle title);
+        ObservableCollection<Story> AllStories { get; }
+        void ChangeCurrentStoryByTitle(string title);
     }
 
     public class HarryPotterStoryModel : IStoryModel
@@ -18,7 +19,7 @@ namespace SelectedTextSpeach.Data.Models
         private readonly IStoryRepository repository;
         public Story InitialStory { get; }
         public ReactivePropertySlim<Story> CurrentStory { get; }
-        public Story[] AllStories { get; }
+        public ObservableCollection<Story> AllStories { get; }
 
         public HarryPotterStoryModel()
         {
@@ -28,7 +29,8 @@ namespace SelectedTextSpeach.Data.Models
             {
                 repository.Add(resourceLoader.GetString(titleKey), resourceLoader.GetString(contentKey));
             }
-            AllStories = repository.All();
+            AllStories = new ObservableCollection<Story>(repository.All());
+
             InitialStory = AllStories.FirstOrDefault();
 
             CurrentStory = new ReactivePropertySlim<Story>
@@ -37,9 +39,9 @@ namespace SelectedTextSpeach.Data.Models
             };
         }
 
-        public void ChangeCurrentStoryByTitle(StoryTitle title)
+        public void ChangeCurrentStoryByTitle(string title)
         {
-            var current = repository.Get(title.Title);
+            var current = repository.Get(title);
             if (current != null)
             {
                 CurrentStory.Value = current;

@@ -22,18 +22,13 @@ namespace SelectedTextSpeach.Views
         public MainPage()
         {
             InitializeComponent();
-            foreach (var story in ViewModel.ListViewItemStory)
-            {
-                storyListView.Items.Add(new StoryTitle { Title = story.Title });
-            }
-
             // Edit only Instance to show Initial RP Value (by DataContext)
             DataContext = ViewModel;
         }
 
         private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.StorySelectionChanged(storyListView.SelectedItem as StoryTitle);
+            ViewModel.StorySelectionChanged(storyListView.SelectedItem.ToString());
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)

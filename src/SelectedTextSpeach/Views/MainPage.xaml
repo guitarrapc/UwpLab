@@ -29,7 +29,7 @@
                         Click="{x:Bind ViewModel.StopInputBox}">
                 </Button>
             </StackPanel>
-            <ListView x:Name="storyListView" Grid.Row="1" SelectionMode="Single" SelectionChanged="StorySelectionChanged"/>
+            <ListView x:Name="storyListView" ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}" Grid.Row="1" SelectionMode="Single" SelectionChanged="StorySelectionChanged"/>
             <ListView x:Name="listView" Grid.Row="1" SelectionMode="Single" SelectionChanged="SelectionChanged">
                 <entity:Person Name="PiyoPiyo" />
                 <entity:Person Name="FugaFuga" />
