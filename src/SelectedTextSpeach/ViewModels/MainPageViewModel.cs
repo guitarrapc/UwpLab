@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -13,20 +12,22 @@ using Windows.UI.Popups;
 
 namespace SelectedTextSpeach.ViewModels
 {
-    public class MainPageViewModel : IDisposable, INotifyPropertyChanged
+    public class MainPageViewModel : IDisposable
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public ReactiveProperty<string> Input { get; }
         public ReadOnlyReactiveProperty<string> Output { get; }
         public Person SelectedItem { get; set; }
+
         public ReactiveProperty<string> TextBoxInput { get; }
-        public ReactiveProperty<string> PlayIcon { get; }
+        public ReactiveProperty<string> PlayIconTextBoxInput { get; }
         public Story[] ListViewItemStory { get; }
 
+        public ReactiveProperty<string> TextBoxSelection { get; }
+        public ReactiveProperty<string> PlayIconTextBoxSelection { get; }
+
         private readonly IStoryModel storyModel = new HarryPotterStoryModel();
-        private readonly ContentReaderModel contentReaderModel = new ContentReaderModel();
-        private readonly ContentReaderModel TextBoxInputReader = new ContentReaderModel();
+        private readonly IContentReader TextBoxInputReader = new ContentReaderModel();
+        private readonly IContentReader TextBoxSelectionReader = new ContentReaderModel();
         private CompositeDisposable disposable = new CompositeDisposable();
 
         private static readonly string playIcon = "\xE768";
@@ -40,10 +41,13 @@ namespace SelectedTextSpeach.ViewModels
                 .Select(x => x.ToUpper())
                 .ToReadOnlyReactiveProperty();
 
-            TextBoxInput = new ReactiveProperty<string>(storyModel.InitialStory.Content);
-            PlayIcon = new ReactiveProperty<string>(playIcon);
             ListViewItemStory = storyModel.AllStories;
 
+            TextBoxInput = new ReactiveProperty<string>(storyModel.InitialStory.Content);
+            TextBoxSelection = new ReactiveProperty<string>("");
+
+            PlayIconTextBoxInput = new ReactiveProperty<string>(playIcon);
+            PlayIconTextBoxSelection = new ReactiveProperty<string>(playIcon);
             storyModel.CurrentStory.Subscribe(x => TextBoxInput.Value = x.Content).AddTo(disposable);
         }
 
@@ -54,9 +58,9 @@ namespace SelectedTextSpeach.ViewModels
             await dlg.ShowAsync();
         }
 
-        public void StorySelectionChanged(int titleHash)
+        public void StorySelectionChanged(StoryTitle title)
         {
-            storyModel.ChangeCurrentStoryByTitleHash(titleHash);
+            storyModel.ChangeCurrentStoryByTitle(title);
         }
 
         public async Task ReadInputBox()
@@ -64,26 +68,53 @@ namespace SelectedTextSpeach.ViewModels
             if (TextBoxInputReader.IsPlaying)
             {
                 TextBoxInputReader.PauseReadContent();
-                PlayIcon.Value = playIcon;
+                PlayIconTextBoxInput.Value = playIcon;
             }
             else if (TextBoxInputReader.IsPaused)
             {
                 TextBoxInputReader.StartReadContent();
-                PlayIcon.Value = pauseIcon;
+                PlayIconTextBoxInput.Value = pauseIcon;
             }
             else if (!string.IsNullOrWhiteSpace(TextBoxInput.Value))
             {
                 await TextBoxInputReader.SetContent(TextBoxInput.Value);
                 TextBoxInputReader.StartReadContent();
-                PlayIcon.Value = pauseIcon;
+                PlayIconTextBoxInput.Value = pauseIcon;
             }
         }
 
         public void StopInputBox()
         {
             TextBoxInputReader.StopReadContent();
-            PlayIcon.Value = playIcon;
+            PlayIconTextBoxInput.Value = playIcon;
         }
+
+        public async Task ReadSelectionBox()
+        {
+            if (TextBoxSelectionReader.IsPlaying)
+            {
+                TextBoxSelectionReader.PauseReadContent();
+                PlayIconTextBoxSelection.Value = pauseIcon;
+            }
+            else if (TextBoxSelectionReader.IsPaused)
+            {
+                TextBoxSelectionReader.StartReadContent();
+                PlayIconTextBoxSelection.Value = playIcon;
+            }
+            else if (!string.IsNullOrWhiteSpace(TextBoxSelection.Value))
+            {
+                await TextBoxSelectionReader.SetContent(TextBoxSelection.Value);
+                TextBoxSelectionReader.StartReadContent();
+                PlayIconTextBoxSelection.Value = pauseIcon;
+            }
+        }
+
+        public void StopSelectionBox()
+        {
+            TextBoxSelectionReader.StopReadContent();
+            PlayIconTextBoxSelection.Value = playIcon;
+        }
+
 
         public void Dispose()
         {

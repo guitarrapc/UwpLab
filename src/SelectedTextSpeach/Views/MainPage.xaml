@@ -18,7 +18,7 @@
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     SelectionChanged="TextBoxInput_SelectionChanged" />
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="inputTextReadButton" Margin="10" Content="{x:Bind ViewModel.PlayIcon.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
+                <Button x:Name="inputTextReadButton" Margin="10" Content="{x:Bind ViewModel.PlayIconTextBoxInput.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
                         Click="{x:Bind ViewModel.ReadInputBox}" />
                 <Button x:Name="inputTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopInputBox}">
@@ -38,13 +38,14 @@
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="textBoxSelected" Height="200" Width="300" Margin="10"
                      Background="LightGray"
+                     Text="{x:Bind ViewModel.TextBoxSelection.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Header="Your selected text"
                      TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True"/>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="selectedTextReadButton" Content="&#xE768;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                        Click="SelectedTextBoxPlayButton_Click"/>
+                <Button x:Name="selectedTextReadButton" Content="{x:Bind ViewModel.PlayIconTextBoxSelection.Value, Mode=OneWay}" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Click="{x:Bind ViewModel.ReadSelectionBox}" />
                 <Button x:Name="selectedTextStopButton" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                        Click="SelectedTextBoxStopButton_Click"/>
+                        Click="{x:Bind ViewModel.StopSelectionBox}"/>
             </StackPanel>
         </StackPanel>
         <TextBlock x:Name="label1" HorizontalAlignment="Center"/>

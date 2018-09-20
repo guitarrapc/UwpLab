@@ -10,7 +10,7 @@ namespace SelectedTextSpeach.Data.Models
         Story InitialStory { get; }
         ReactivePropertySlim<Story> CurrentStory { get; }
         Story[] AllStories { get; }
-        void ChangeCurrentStoryByTitleHash(int titleHash);
+        void ChangeCurrentStoryByTitle(StoryTitle title);
     }
 
     public class HarryPotterStoryModel : IStoryModel
@@ -22,7 +22,6 @@ namespace SelectedTextSpeach.Data.Models
 
         public HarryPotterStoryModel()
         {
-
             repository = new StoryRepostiory();
             var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync().Result;
             foreach (var (order, titleKey, contentKey) in ApplicationSettings.HarryPotterStoryTextResources)
@@ -38,10 +37,13 @@ namespace SelectedTextSpeach.Data.Models
             };
         }
 
-        public void ChangeCurrentStoryByTitleHash(int titleHash)
+        public void ChangeCurrentStoryByTitle(StoryTitle title)
         {
-            var current = repository.Get(titleHash);
-            CurrentStory.Value = current;
+            var current = repository.Get(title.Title);
+            if (current != null)
+            {
+                CurrentStory.Value = current;
+            }
         }
     }
 }

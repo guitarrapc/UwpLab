@@ -96,6 +96,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ApplicationSettings.cs" />
+    <Compile Include="Data\Entities\StoryTitle.cs" />
     <Compile Include="Models\Repositories\StoryRepository.cs" />
     <Compile Include="Models\StoryModel.cs" />
     <Compile Include="Data\Entities\Story.cs" />
