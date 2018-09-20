@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -12,8 +13,10 @@ using Windows.UI.Popups;
 
 namespace SelectedTextSpeach.ViewModels
 {
-    public class MainPageViewModel : IDisposable
+    public class MainPageViewModel : IDisposable, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ReactiveProperty<string> Input { get; }
         public ReadOnlyReactiveProperty<string> Output { get; }
         public Person SelectedItem { get; set; }

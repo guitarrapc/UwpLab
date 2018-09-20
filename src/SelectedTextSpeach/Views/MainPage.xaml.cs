@@ -26,6 +26,9 @@ namespace SelectedTextSpeach.Views
             {
                 storyListView.Items.Add(new StoryTitle { Title = story.Title });
             }
+
+            // Edit only Instance to show Initial RP Value (by DataContext)
+            DataContext = ViewModel;
         }
 
         private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -3,11 +3,16 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SelectedTextSpeach"
+    xmlns:viewModel="using:SelectedTextSpeach.ViewModels"
     xmlns:entity="using:SelectedTextSpeach.Data.Entities"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.DataContext>
+        <!-- Edit Only : To Show RP<T> Initial Value by Binging, not x:Bind. -->
+        <viewModel:MainPageViewModel />
+    </Page.DataContext>
 
     <StackPanel HorizontalAlignment="Center">
         <StackPanel x:Name="inputTextStackPanel" Orientation="Horizontal">
@@ -18,7 +23,7 @@
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     SelectionChanged="TextBoxInput_SelectionChanged" />
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="inputTextReadButton" Margin="10" Content="{x:Bind ViewModel.PlayIconTextBoxInput.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
+                <Button x:Name="inputTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxInput.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
                         Click="{x:Bind ViewModel.ReadInputBox}" />
                 <Button x:Name="inputTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopInputBox}">
@@ -42,9 +47,9 @@
                      Header="Your selected text"
                      TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True"/>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="selectedTextReadButton" Content="{x:Bind ViewModel.PlayIconTextBoxSelection.Value, Mode=OneWay}" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                <Button x:Name="selectedTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxSelection.Value, Mode=OneWay}" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.ReadSelectionBox}" />
-                <Button x:Name="selectedTextStopButton" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                <Button x:Name="selectedTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopSelectionBox}"/>
             </StackPanel>
         </StackPanel>
