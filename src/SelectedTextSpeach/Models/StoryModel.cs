@@ -8,18 +8,18 @@ namespace SelectedTextSpeach.Data.Models
 {
     public interface IStoryModel
     {
-        Story InitialStory { get; }
-        ReactivePropertySlim<Story> CurrentStory { get; }
-        ObservableCollection<Story> AllStories { get; }
+        StoryEntity InitialStory { get; }
+        ReactivePropertySlim<StoryEntity> CurrentStory { get; }
+        ObservableCollection<StoryEntity> AllStories { get; }
         void ChangeCurrentStoryByTitle(string title);
     }
 
     public class HarryPotterStoryModel : IStoryModel
     {
         private readonly IStoryRepository repository;
-        public Story InitialStory { get; }
-        public ReactivePropertySlim<Story> CurrentStory { get; }
-        public ObservableCollection<Story> AllStories { get; }
+        public StoryEntity InitialStory { get; }
+        public ReactivePropertySlim<StoryEntity> CurrentStory { get; }
+        public ObservableCollection<StoryEntity> AllStories { get; }
 
         public HarryPotterStoryModel()
         {
@@ -29,16 +29,20 @@ namespace SelectedTextSpeach.Data.Models
             {
                 repository.Add(resourceLoader.GetString(titleKey), resourceLoader.GetString(contentKey));
             }
-            AllStories = new ObservableCollection<Story>(repository.All());
+            AllStories = new ObservableCollection<StoryEntity>(repository.All());
 
             InitialStory = AllStories.FirstOrDefault();
 
-            CurrentStory = new ReactivePropertySlim<Story>
+            CurrentStory = new ReactivePropertySlim<StoryEntity>
             {
                 Value = InitialStory
             };
         }
 
+        /// <summary>
+        /// CurrentStory will be notify from <see cref="CurrentStory"/> Reactive Property
+        /// </summary>
+        /// <param name="title"></param>
         public void ChangeCurrentStoryByTitle(string title)
         {
             var current = repository.Get(title);

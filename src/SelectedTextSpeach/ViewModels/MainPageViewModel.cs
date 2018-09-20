@@ -19,7 +19,7 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<string> Input { get; }
         public ReadOnlyReactiveProperty<string> Output { get; }
-        public Person SelectedItem { get; set; }
+        public PersonEntity SelectedItem { get; set; }
 
         public ReactiveProperty<string> TextBoxInput { get; }
         public ReactiveProperty<string> PlayIconTextBoxInput { get; }

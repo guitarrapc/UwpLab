@@ -1,6 +1,6 @@
 namespace SelectedTextSpeach.Data.Entities
 {
-    public class Person
+    public class PersonEntity
     {
         public string Name { get; set; }
 

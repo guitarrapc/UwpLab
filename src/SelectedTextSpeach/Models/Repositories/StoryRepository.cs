@@ -8,29 +8,29 @@ namespace SelectedTextSpeach.Data.Models.Repositories
     public interface IStoryRepository
     {
         void Add(string title, string content);
-        Story Get(string title);
-        Story[] All();
+        StoryEntity Get(string title);
+        StoryEntity[] All();
         void Remove(string title);
         void Clear();
     }
 
     public class StoryRepostiory : IStoryRepository
     {
-        private readonly List<Story> stories = new List<Story>();
+        private readonly List<StoryEntity> stories = new List<StoryEntity>();
         private ConcurrentDictionary<int, string> StoryTitleReference { get; } = new ConcurrentDictionary<int, string>();
 
         public void Add(string title, string content)
         {
-            stories.Add(new Story(title, content));
+            stories.Add(new StoryEntity(title, content));
             StoryTitleReference.TryAdd(title.GetHashCode(), title);
         }
 
-        public Story Get(string title)
+        public StoryEntity Get(string title)
         {
             return stories.FirstOrDefault(x => x.Title == title);
         }
 
-        public Story[] All()
+        public StoryEntity[] All()
         {
             return stories.ToArray();
         }

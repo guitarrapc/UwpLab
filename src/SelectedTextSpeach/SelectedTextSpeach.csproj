@@ -96,15 +96,14 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ApplicationSettings.cs" />
-    <Compile Include="Data\Entities\StoryTitle.cs" />
     <Compile Include="Models\Repositories\StoryRepository.cs" />
     <Compile Include="Models\StoryModel.cs" />
-    <Compile Include="Data\Entities\Story.cs" />
+    <Compile Include="Data\Entities\StoryEntity.cs" />
     <Compile Include="Helpers\StringsResourcesHelpers.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Data\Entities\Person.cs" />
+    <Compile Include="Data\Entities\PersonEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ContentReaderModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />

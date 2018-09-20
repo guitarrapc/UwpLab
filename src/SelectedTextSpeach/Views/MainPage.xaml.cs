@@ -33,7 +33,7 @@ namespace SelectedTextSpeach.Views
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.SelectedItem = listView.SelectedItem as Person;
+            ViewModel.SelectedItem = listView.SelectedItem as PersonEntity;
         }
 
         private void TextBoxInput_SelectionChanged(object sender, RoutedEventArgs e)

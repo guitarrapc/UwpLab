@@ -31,10 +31,10 @@
             </StackPanel>
             <ListView x:Name="storyListView" ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}" Grid.Row="1" SelectionMode="Single" SelectionChanged="StorySelectionChanged"/>
             <ListView x:Name="listView" Grid.Row="1" SelectionMode="Single" SelectionChanged="SelectionChanged">
-                <entity:Person Name="PiyoPiyo" />
-                <entity:Person Name="FugaFuga" />
-                <entity:Person Name="OroOro" />
-                <entity:Person Name="Homuhomu" />
+                <entity:PersonEntity Name="PiyoPiyo" />
+                <entity:PersonEntity Name="FugaFuga" />
+                <entity:PersonEntity Name="OroOro" />
+                <entity:PersonEntity Name="Homuhomu" />
             </ListView>
             <Button Content="Dump"
                 HorizontalAlignment="Stretch"
