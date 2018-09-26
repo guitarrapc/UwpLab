@@ -22,19 +22,16 @@
             <StackPanel Orientation="Horizontal">
                 <ComboBox x:Name="ProjectComboBox"
                       Width="200" Margin="5"
-                      ItemsSource="{x:Bind ViewModel.Projects}" SelectedItem="{x:Bind ViewModel.SelectedProject.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Header="Projects" PlaceholderText="Pick a Project"
-                      SelectionChanged="{x:Bind ViewModel.ProjectComboBox_SelectionChanged}"/>
+                      ItemsSource="{x:Bind ViewModel.Projects}" SelectedItem="{x:Bind ViewModel.SelectedProject.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Project"
+                      Header="Projects" PlaceholderText="Pick a Project"/>
                 <ComboBox x:Name="BranchComboBox"
                       Width="200" Margin="5"
-                      ItemsSource="{x:Bind ViewModel.Branches}" SelectedItem="{x:Bind ViewModel.SelectedBranch.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Header="Projects" PlaceholderText="Pick a Branch"
-                      SelectionChanged="{x:Bind ViewModel.BranchComboBox_SelectionChanged}"/>
+                      ItemsSource="{x:Bind ViewModel.Branches}" SelectedItem="{x:Bind ViewModel.SelectedBranch.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Branch"
+                      Header="Projects" PlaceholderText="Pick a Branch"/>
                 <ComboBox x:Name="ArtifactComboBox"
                       Width="200" Margin="5"
-                      ItemsSource="{x:Bind ViewModel.Artifacts}" SelectedItem="{x:Bind ViewModel.SelectedArtifact.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Artifact"
-                      Header="Projects" PlaceholderText="Pick a Artifact"
-                      SelectionChanged="{x:Bind ViewModel.ArtifactComboBox_SelectionChanged}"/>
+                      ItemsSource="{x:Bind ViewModel.Artifacts}" SelectedItem="{x:Bind ViewModel.SelectedArtifact.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"
+                      Header="Projects" PlaceholderText="Pick a Artifact"/>
             </StackPanel>
         </StackPanel>
     </Grid>

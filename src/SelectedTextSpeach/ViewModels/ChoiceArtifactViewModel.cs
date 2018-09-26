@@ -16,19 +16,19 @@ namespace SelectedTextSpeach.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IBlobArtifact model = new BlobArtifactUsecase();
+        private IBlobArtifact usecase = new BlobArtifactUsecase();
         private CompositeDisposable disposable = new CompositeDisposable();
 
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
         //TODO: Should change Data Structure.
-        public ObservableCollection<string> Projects { get; } = new ObservableCollection<string>();
-        public ReactiveProperty<string> SelectedProject { get; } = new ReactiveProperty<string>();
-        public ObservableCollection<string> Branches { get; } = new ObservableCollection<string>();
-        public ReactiveProperty<string> SelectedBranch { get; } = new ReactiveProperty<string>();
-        public ObservableCollection<BlobArtifactEntity> Artifacts { get; } = new ObservableCollection<BlobArtifactEntity>();
-        public ReactiveProperty<BlobArtifactEntity> SelectedArtifact { get; } = new ReactiveProperty<BlobArtifactEntity>();
+        public ObservableCollection<IArtifactEntity> Projects { get; } = new ObservableCollection<IArtifactEntity>();
+        public ReactiveProperty<IArtifactEntity> SelectedProject { get; } = new ReactiveProperty<IArtifactEntity>();
+        public ReactiveCollection<IBranchArtifactEntity> Branches { get; }
+        public ReactiveProperty<IBranchArtifactEntity> SelectedBranch { get; } = new ReactiveProperty<IBranchArtifactEntity>();
+        public ReactiveCollection<IArtifactDetailEntity> Artifacts { get; }
+        public ReactiveProperty<IArtifactDetailEntity> SelectedArtifact { get; } = new ReactiveProperty<IArtifactDetailEntity>();
 
         public ChoiceArtifactViewModel()
         {
@@ -39,47 +39,35 @@ namespace SelectedTextSpeach.ViewModels
             StorageConnectionInput = new ReactiveProperty<string>(blobConnectionString);
             StorageContainerInput = new ReactiveProperty<string>(containerName);
 
-            model.Artifacts
+            // Initialize by obtain artifact informations
+            usecase.Artifacts
                 .Where(x => x != null)
                 .Subscribe(x =>
                 {
-                    x.Select(y => y.Project)
-                        .Distinct()
-                        .ForEach(item => Projects.Add(item));
+                    x.ForEach(y => Projects.Add(y));
                 })
                 .AddTo(disposable);
 
+            // Update Collection with Clear existing collection when selected.
+            Branches = SelectedProject.Where(x => x != null)
+                .Do(_ => Branches?.Clear())
+                .SelectMany(x => usecase.GetArtifactCache(x.Project))
+                .ToReactiveCollection();
+            Artifacts = SelectedBranch.Where(x => x != null)
+                .Do(_ => Artifacts?.Clear())
+                .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
+                .ToReactiveCollection();
+
+            // Next action
+            //TODO: Enable Download
+            //TODO: Set Download Path
+            //TODO: Show Download Detail
             SelectedArtifact.Subscribe().AddTo(disposable);
         }
 
         public async void OpenBlob()
         {
-            await model.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
-        }
-
-        public async void ProjectComboBox_SelectionChanged()
-        {
-            Branches.Clear();
-            Artifacts.Clear();
-            model.GetInfo()
-                .Where(x => x.Project == SelectedProject.Value)
-                .Select(x => x.Branch)
-                .Distinct()
-                .ForEach(item => Branches.Add(item));
-        }
-
-        public async void BranchComboBox_SelectionChanged()
-        {
-            Artifacts.Clear();
-            model.GetInfo()
-                .Where(x => x.Project == SelectedProject.Value)
-                .Where(x => x.Branch == SelectedBranch.Value)
-                .ForEach(item => Artifacts.Add(item));
-        }
-
-        public async void ArtifactComboBox_SelectionChanged()
-        {
-            var hoge = SelectedArtifact;
+            await usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
         }
 
         public void Dispose()

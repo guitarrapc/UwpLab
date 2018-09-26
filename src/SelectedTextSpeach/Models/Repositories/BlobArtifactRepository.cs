@@ -16,34 +16,39 @@ namespace SelectedTextSpeach.Models.Repositories
             this.blobStorageConnection = blobStorageConnection;
         }
 
-        public async Task<BlobArtifactEntity[]> GetBlobArtifactsAsync(string containerName)
+        public async Task<IArtifactEntity[]> GetBlobArtifactsAsync(string containerName)
         {
             var storageClient = CloudStorageAccount.Parse(blobStorageConnection);
             var blobClient = storageClient.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
 
-            // Flatten all items
-            var blobInformations = new List<BlobArtifactEntity>();
             // project
+            var artifactList = new List<IArtifactEntity>();
             var directories = await GetBlobItemsAsync<CloudBlobDirectory>(container, null);
             foreach (var directory in directories)
             {
                 // branch
+                var branchArtifactList = new List<IBranchArtifactEntity>();
                 var branches = await GetBlobItemsAsync<CloudBlobDirectory>(container, directory.Prefix);
                 await Task.WhenAll(branches.Select(async xs =>
                 {
                     // blob
+                    var artifactDetailList = new List<IArtifactDetailEntity>();
                     var details = await GetBlobItemsAsync<CloudBlockBlob>(container, xs.Prefix);
                     foreach (var detail in details)
                     {
-                        var projectName = directory.Prefix.Substring(0, directory.Prefix.Length - 1);
-                        var branchName = xs.Prefix.Substring(directory.Prefix.Length, xs.Prefix.Length - directory.Prefix.Length - 1);
-                        blobInformations.Add(new BlobArtifactEntity(projectName, branchName, detail.Name, detail.Uri, detail.StreamWriteSizeInBytes));
+                        artifactDetailList.Add(new BlobArtifactDetailEntity(detail.Name, detail.Uri, detail.StreamWriteSizeInBytes));
                     }
+
+                    var branchName = xs.Prefix.Substring(directory.Prefix.Length, xs.Prefix.Length - directory.Prefix.Length - 1);
+                    branchArtifactList.Add(new BlobBranchArtifactEntity(branchName, artifactDetailList.ToArray()));
                 }));
+
+                var projectName = directory.Prefix.Substring(0, directory.Prefix.Length - 1);
+                artifactList.Add(new BlobArtifactEntity(projectName, branchArtifactList.ToArray()));
             };
 
-            return blobInformations.ToArray();
+            return artifactList.ToArray();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Reactive.Bindings;
@@ -9,17 +10,19 @@ namespace SelectedTextSpeach.Models.Usecase
 {
     public interface IBlobArtifact
     {
-        ReadOnlyReactivePropertySlim<BlobArtifactEntity[]> Artifacts { get; }
+        ReadOnlyReactivePropertySlim<IArtifactEntity[]> Artifacts { get; }
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
-        BlobArtifactEntity[] GetInfo();
+        IArtifactEntity[] GetArtifactCache();
+        IBranchArtifactEntity[] GetArtifactCache(string projectName);
+        IArtifactDetailEntity[] GetArtifactCache(string projectName, string branchNam);
     }
 
     public class BlobArtifactUsecase : IBlobArtifact
     {
-        public ReadOnlyReactivePropertySlim<BlobArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
-        private Subject<BlobArtifactEntity[]> blobArtifactSubject = new Subject<BlobArtifactEntity[]>();
+        public ReadOnlyReactivePropertySlim<IArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
+        private Subject<IArtifactEntity[]> blobArtifactSubject = new Subject<IArtifactEntity[]>();
 
-        private BlobArtifactEntity[] cache = null;
+        private IArtifactEntity[] cache = Array.Empty<IArtifactEntity>();
 
         public async Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName)
         {
@@ -38,9 +41,39 @@ namespace SelectedTextSpeach.Models.Usecase
             }
         }
 
-        public BlobArtifactEntity[] GetInfo()
+        public IArtifactEntity[] GetArtifactCache()
         {
+            if (!cache.Any())
+            {
+                return Array.Empty<IArtifactEntity>();
+            }
             return cache;
+        }
+
+        public IBranchArtifactEntity[] GetArtifactCache(string projectName)
+        {
+            if (!cache.Any())
+            {
+                return Array.Empty<IBranchArtifactEntity>();
+            }
+            var result = cache.Where(x => x.Project == projectName)
+                .SelectMany(x => x.BranchArtifactDetail)
+                .ToArray();
+            return result;
+        }
+
+        public IArtifactDetailEntity[] GetArtifactCache(string projectName, string branchName)
+        {
+            if (!cache.Any())
+            {
+                return Array.Empty<IArtifactDetailEntity>();
+            }
+            var result = cache.Where(x => x.Project == projectName)
+                .SelectMany(x => x.BranchArtifactDetail)
+                .Where(x => x.Branch == branchName)
+                .SelectMany(x => x.Artifact)
+                .ToArray();
+            return result;
         }
     }
 }
