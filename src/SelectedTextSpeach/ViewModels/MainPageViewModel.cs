@@ -17,6 +17,14 @@ namespace SelectedTextSpeach.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private readonly IStoryModel storyModel = new HarryPotterStoryModel();
+        private readonly IContentReader TextBoxInputReader = new ContentReaderModel();
+        private readonly IContentReader TextBoxSelectionReader = new ContentReaderModel();
+        private CompositeDisposable disposable = new CompositeDisposable();
+
+        private static readonly string playIcon = "\xE768";
+        private static readonly string pauseIcon = "\xE769";
+
         public ReactiveProperty<string> Input { get; }
         public ReadOnlyReactiveProperty<string> Output { get; }
         public PersonEntity SelectedItem { get; set; }
@@ -28,14 +36,6 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<string> TextBoxSelection { get; }
         public ReactiveProperty<string> PlayIconTextBoxSelection { get; }
-
-        private readonly IStoryModel storyModel = new HarryPotterStoryModel();
-        private readonly IContentReader TextBoxInputReader = new ContentReaderModel();
-        private readonly IContentReader TextBoxSelectionReader = new ContentReaderModel();
-        private CompositeDisposable disposable = new CompositeDisposable();
-
-        private static readonly string playIcon = "\xE768";
-        private static readonly string pauseIcon = "\xE769";
 
         public MainPageViewModel()
         {

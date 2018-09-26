@@ -21,6 +21,7 @@ namespace SelectedTextSpeach
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.UnhandledException += OnUnhandledException;
         }
 
         /// <summary>
@@ -86,6 +87,16 @@ namespace SelectedTextSpeach
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        /// <summary>
+        /// https://d-fens.ch/2017/12/27/howto-react-to-unhandled-exceptions-in-uwp/
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="unhandledExceptionEventArgs"></param>
+        private void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            // Your code to handle the exception (You can not prevent application down, but save status or something would be possible)
         }
     }
 }

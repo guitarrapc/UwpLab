@@ -4,6 +4,7 @@ using SelectedTextSpeach.Data.Entities;
 using SelectedTextSpeach.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -24,6 +25,25 @@ namespace SelectedTextSpeach.Views
             InitializeComponent();
             // Edit only Instance to show Initial RP Value (by DataContext)
             DataContext = ViewModel;
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            // このようにe.Parameterで前のページから渡された値を取得できます。
+            // 値はキャストして取り出します。
+            var param = e.Parameter as string;
+
+            base.OnNavigatedTo(e);
+        }
+
+        public async void NavigateChoiceArtifactPage(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(ChoiceArtifactsPage), "hogemoge");
         }
 
         private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)
