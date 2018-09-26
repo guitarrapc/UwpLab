@@ -4,9 +4,9 @@ using Reactive.Bindings;
 using SelectedTextSpeach.Data.Entities;
 using SelectedTextSpeach.Data.Models.Repositories;
 
-namespace SelectedTextSpeach.Data.Models
+namespace SelectedTextSpeach.Models.Usecase
 {
-    public interface IStoryModel
+    public interface IStory
     {
         StoryEntity InitialStory { get; }
         ReactivePropertySlim<StoryEntity> CurrentStory { get; }
@@ -14,14 +14,14 @@ namespace SelectedTextSpeach.Data.Models
         void ChangeCurrentStoryByTitle(string title);
     }
 
-    public class HarryPotterStoryModel : IStoryModel
+    public class HarryPotterStoryUsecase : IStory
     {
         private readonly IStoryRepository repository;
         public StoryEntity InitialStory { get; }
         public ReactivePropertySlim<StoryEntity> CurrentStory { get; }
         public ObservableCollection<StoryEntity> AllStories { get; }
 
-        public HarryPotterStoryModel()
+        public HarryPotterStoryUsecase()
         {
             repository = new StoryRepostiory();
             var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync().Result;

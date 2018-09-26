@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Data.Entities;
-using SelectedTextSpeach.Models;
+using SelectedTextSpeach.Models.Usecase;
 using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels
@@ -16,7 +16,7 @@ namespace SelectedTextSpeach.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IBlobArtifactModel model = new BlobArtifactModel();
+        private IBlobArtifact model = new BlobArtifactUsecase();
         private CompositeDisposable disposable = new CompositeDisposable();
 
         public ReactiveProperty<string> StorageConnectionInput { get; }

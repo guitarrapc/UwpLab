@@ -5,16 +5,16 @@ using Reactive.Bindings;
 using SelectedTextSpeach.Data.Entities;
 using SelectedTextSpeach.Models.Repositories;
 
-namespace SelectedTextSpeach.Models
+namespace SelectedTextSpeach.Models.Usecase
 {
-    public interface IBlobArtifactModel
+    public interface IBlobArtifact
     {
         ReadOnlyReactiveProperty<BlobArtifactEntity[]> Artifacts { get; }
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
         BlobArtifactEntity[] GetInfo();
     }
 
-    public class BlobArtifactModel : IBlobArtifactModel
+    public class BlobArtifactUsecase : IBlobArtifact
     {
         public ReadOnlyReactiveProperty<BlobArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactiveProperty();
         private Subject<BlobArtifactEntity[]> blobArtifactSubject = new Subject<BlobArtifactEntity[]>();
