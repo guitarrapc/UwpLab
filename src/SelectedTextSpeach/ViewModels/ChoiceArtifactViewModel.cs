@@ -32,8 +32,12 @@ namespace SelectedTextSpeach.ViewModels
 
         public ChoiceArtifactViewModel()
         {
-            StorageConnectionInput = new ReactiveProperty<string>("STORAGE_CONNECTION_STRING");
-            StorageContainerInput = new ReactiveProperty<string>("CONTAINER_NAME");
+            var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync("resourceFile").Result;
+            var blobConnectionString = resourceLoader.GetString("azure_storage_blob_connectionstring");
+            var containerName = resourceLoader.GetString("container_name");
+
+            StorageConnectionInput = new ReactiveProperty<string>(blobConnectionString);
+            StorageContainerInput = new ReactiveProperty<string>(containerName);
 
             model.Artifacts
                 .Where(x => x != null)

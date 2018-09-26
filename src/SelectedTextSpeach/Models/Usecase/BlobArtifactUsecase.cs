@@ -9,14 +9,14 @@ namespace SelectedTextSpeach.Models.Usecase
 {
     public interface IBlobArtifact
     {
-        ReadOnlyReactiveProperty<BlobArtifactEntity[]> Artifacts { get; }
+        ReadOnlyReactivePropertySlim<BlobArtifactEntity[]> Artifacts { get; }
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
         BlobArtifactEntity[] GetInfo();
     }
 
     public class BlobArtifactUsecase : IBlobArtifact
     {
-        public ReadOnlyReactiveProperty<BlobArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactiveProperty();
+        public ReadOnlyReactivePropertySlim<BlobArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
         private Subject<BlobArtifactEntity[]> blobArtifactSubject = new Subject<BlobArtifactEntity[]>();
 
         private BlobArtifactEntity[] cache = null;

@@ -25,5 +25,22 @@ namespace SelectedTextSpeach
             }
             return loader;
         }
+
+        public static async Task<ResourceLoader> SafeGetForCurrentViewAsync(string name)
+        {
+            ResourceLoader loader = null;
+            if (CoreWindow.GetForCurrentThread() != null)
+            {
+                loader = ResourceLoader.GetForCurrentView(name);
+            }
+            else
+            {
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    loader = ResourceLoader.GetForCurrentView(name);
+                });
+            }
+            return loader;
+        }
     }
 }
