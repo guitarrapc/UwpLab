@@ -29,7 +29,27 @@
                         Click="{x:Bind ViewModel.StopInputBox}">
                 </Button>
             </StackPanel>
-            <ListView x:Name="storyListView" ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}" Grid.Row="1" SelectionMode="Single" SelectionChanged="StorySelectionChanged"/>
+            <!--<ListView x:Name="storyListView" ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}" Grid.Row="1" SelectionMode="Single" SelectionChanged="StorySelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" Margin="2.5"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>-->
+            <ComboBox x:Name="storyComboBox" Height="40" Width="120" Margin="10"
+                      ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}"
+                      PlaceholderText="Select story"
+                      SelectionChanged="StorySelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" Margin="2.5" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <ListView x:Name="listView" Grid.Row="1" SelectionMode="Single" SelectionChanged="SelectionChanged">
                 <entity:PersonEntity Name="PiyoPiyo" />
                 <entity:PersonEntity Name="FugaFuga" />

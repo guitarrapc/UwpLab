@@ -23,7 +23,8 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<string> TextBoxInput { get; }
         public ReactiveProperty<string> PlayIconTextBoxInput { get; }
-        public ReadOnlyReactiveCollection<string> SpeechTitles { get; }
+        //public ReadOnlyReactiveCollection<string> SpeechTitles { get; }
+        public ReadOnlyReactiveCollection<StoryEntity> SpeechTitles { get; }
 
         public ReactiveProperty<string> TextBoxSelection { get; }
         public ReactiveProperty<string> PlayIconTextBoxSelection { get; }
@@ -44,7 +45,7 @@ namespace SelectedTextSpeach.ViewModels
                 .Select(x => x.ToUpper())
                 .ToReadOnlyReactiveProperty();
 
-            SpeechTitles = storyModel.AllStories.Select(x => x.Title).ToObservable().ToReadOnlyReactiveCollection();
+            SpeechTitles = storyModel.AllStories.ToReadOnlyReactiveCollection();
 
             TextBoxInput = new ReactiveProperty<string>(storyModel.InitialStory.Content);
             TextBoxSelection = new ReactiveProperty<string>("");

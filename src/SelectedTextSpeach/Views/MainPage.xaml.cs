@@ -28,7 +28,13 @@ namespace SelectedTextSpeach.Views
 
         private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.StorySelectionChanged(storyListView.SelectedItem.ToString());
+            // ListView
+            //var story = storyListView.SelectedItem as StoryEntity;
+            //ViewModel.StorySelectionChanged(story.Title);
+
+            // ComboBox
+            var story = storyComboBox.SelectedItem as StoryEntity;
+            ViewModel.StorySelectionChanged(story.Title);
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)
