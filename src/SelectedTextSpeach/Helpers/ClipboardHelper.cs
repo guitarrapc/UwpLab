@@ -15,7 +15,7 @@ namespace SelectedTextSpeach
             Clipboard.SetContent(dataPackage);
         }
 
-        public static async Task<string> GetContentFromClipboard()
+        public static async Task<string> GetContentFromClipboardAsync()
         {
             var dataPackageView = Clipboard.GetContent();
             if (dataPackageView.Contains(StandardDataFormats.Text))
