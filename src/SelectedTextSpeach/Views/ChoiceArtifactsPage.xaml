@@ -9,8 +9,20 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <StackPanel  Width="700" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <Button x:Name="NavigateButton" Content="Back" Click="NavigateMainPage"/>
+        <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="NavigateBackButton" VerticalAlignment="Top" HorizontalAlignment="Left"
+                    IsEnabled="True"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    Click="Back_Click"/>
+                <Button x:Name="NavigateChoiceButton" VerticalAlignment="Top" HorizontalAlignment="Left"
+                    IsEnabled="False"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}">
+                    <Button.RenderTransform>
+                        <RotateTransform CenterX="22" CenterY="22" Angle="180"/>
+                    </Button.RenderTransform>
+                </Button>
+            </StackPanel>
             <TextBlock Text="Input Blob Storage ConnectionString"
                 Style="{StaticResource CaptionTextBlockStyle}" />
             <TextBox Margin="5"

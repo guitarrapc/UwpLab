@@ -23,7 +23,7 @@ namespace SelectedTextSpeach.Views
         public MainPage()
         {
             InitializeComponent();
-            //DataContext = ViewModel;
+            DataContext = ViewModel;
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -38,6 +38,9 @@ namespace SelectedTextSpeach.Views
             var param = e.Parameter as string;
 
             base.OnNavigatedTo(e);
+
+            // Clear the Stack
+            Frame.BackStack.Clear();
         }
 
         public async void NavigateChoiceArtifactPage(object sender, RoutedEventArgs e)

@@ -10,89 +10,103 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <!--<Page.DataContext>
+    <Page.DataContext>
         <viewModel:MainPageViewModel />
-    </Page.DataContext>-->
+    </Page.DataContext>
 
-    <StackPanel HorizontalAlignment="Center">
-        <Button x:Name="NavigateButton" Content="Choice Artifact" Click="NavigateChoiceArtifactPage"/>
-        <StackPanel x:Name="inputTextStackPanel" Orientation="Horizontal">
-            <TextBox x:Name="textBoxInput" Height="200" Width="300" Margin="10"
+    <Grid>
+        <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="NavigateBackButton" VerticalAlignment="Top" HorizontalAlignment="Left"
+                    IsEnabled="False"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"/>
+                <Button x:Name="NavigateChoiceButton" VerticalAlignment="Top" HorizontalAlignment="Left"
+                    IsEnabled="True"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    Click="NavigateChoiceArtifactPage">
+                    <Button.RenderTransform>
+                        <RotateTransform CenterX="22" CenterY="22" Angle="180"/>
+                    </Button.RenderTransform>
+                </Button>
+            </StackPanel>
+            <StackPanel x:Name="inputTextStackPanel" Orientation="Horizontal">
+                <TextBox x:Name="textBoxInput" Height="200" Width="300" Margin="10"
                     AcceptsReturn="True" TextWrapping="Wrap"
                     Header="Input your note"
                     Text="{x:Bind ViewModel.TextBoxInput.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     SelectionChanged="TextBoxInput_SelectionChanged" />
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="inputTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxInput.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="inputTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxInput.Value, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent"
                         Click="{x:Bind ViewModel.ReadInputBox}" />
-                <Button x:Name="inputTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    <Button x:Name="inputTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopInputBox}">
-                </Button>
-            </StackPanel>
+                    </Button>
+                </StackPanel>
 
-            <ListView x:Name="storyListView"
+                <ListView x:Name="storyListView"
                       Grid.Row="1" SelectionMode="Single"
                     ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}"
                       SelectedItem="{x:Bind ViewModel.SelectedTitle.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       DisplayMemberPath="Title">
-                <!--<ListView.ItemTemplate>
+                    <!--<ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Title}" Margin="2.5"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>-->
-            </ListView>
+                </ListView>
 
-            <ComboBox x:Name="storyComboBox" Height="40" Width="120" Margin="10"
+                <ComboBox x:Name="storyComboBox" Height="40" Width="120" Margin="10"
                       PlaceholderText="Select story"
                       ItemsSource="{x:Bind ViewModel.SpeechTitles, Mode=OneWay}"
                       SelectedItem="{x:Bind ViewModel.SelectedTitle.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       DisplayMemberPath="Title">
-                <!--<ComboBox.ItemTemplate>
+                    <!--<ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Title}" Margin="2.5" TextWrapping="Wrap"/>
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>-->
-            </ComboBox>
-            <ListView x:Name="listView" Grid.Row="1" SelectionMode="Single" SelectionChanged="SelectionChanged">
-                <entity:PersonEntity Name="PiyoPiyo" />
-                <entity:PersonEntity Name="FugaFuga" />
-                <entity:PersonEntity Name="OroOro" />
-                <entity:PersonEntity Name="Homuhomu" />
-            </ListView>
-            <Button Content="Dump"
+                </ComboBox>
+                <ListView x:Name="listView" Grid.Row="1" SelectionMode="Single" SelectionChanged="SelectionChanged">
+                    <entity:PersonEntity Name="PiyoPiyo" />
+                    <entity:PersonEntity Name="FugaFuga" />
+                    <entity:PersonEntity Name="OroOro" />
+                    <entity:PersonEntity Name="Homuhomu" />
+                </ListView>
+                <Button Content="Dump"
                 HorizontalAlignment="Stretch"
                 Click="{x:Bind ViewModel.Dump}" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="textBoxSelected" Height="200" Width="300" Margin="10"
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="textBoxSelected" Height="200" Width="300" Margin="10"
                      Background="LightGray"
                      Text="{x:Bind ViewModel.TextBoxSelection.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Header="Your selected text"
                      TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True"/>
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="selectedTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxSelection.Value, Mode=OneWay}" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="selectedTextReadButton" Margin="10" Content="{Binding PlayIconTextBoxSelection.Value, Mode=OneWay}" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.ReadSelectionBox}" />
-                <Button x:Name="selectedTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    <Button x:Name="selectedTextStopButton" Margin="10" Content="&#xE71A;" Background="Transparent" FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Click="{x:Bind ViewModel.StopSelectionBox}"/>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
-        <TextBlock x:Name="label1" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="label2" HorizontalAlignment="Center"/>
-        <StackPanel Width="700" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <TextBlock Text="Input"
+            <TextBlock x:Name="label1" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="label2" HorizontalAlignment="Center"/>
+            <StackPanel Width="700" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <TextBlock Text="Input"
                 Style="{StaticResource CaptionTextBlockStyle}" />
-            <TextBox Text="{x:Bind ViewModel.Input.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox Text="{x:Bind ViewModel.Input.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Margin="5" />
-            <TextBlock Text="Output"
+                <TextBlock Text="Output"
                 Style="{StaticResource CaptionTextBlockStyle}" />
-            <TextBlock Text="{x:Bind ViewModel.Output.Value, Mode=OneWay}"
+                <TextBlock Text="{x:Bind ViewModel.Output.Value, Mode=OneWay}"
                 Style="{StaticResource BodyTextBlockStyle}"
                 Margin="5" />
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </Page>
