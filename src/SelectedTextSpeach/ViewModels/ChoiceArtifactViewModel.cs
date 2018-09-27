@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
-using SelectedTextSpeach.Models.UseCase;
+using SelectedTextSpeach.Models.UseCases;
 using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels

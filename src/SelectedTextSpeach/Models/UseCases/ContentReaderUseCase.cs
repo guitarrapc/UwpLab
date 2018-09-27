@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace SelectedTextSpeach.Models.UseCase
+namespace SelectedTextSpeach.Models.UseCases
 {
     public enum SpeechLanugage
     {

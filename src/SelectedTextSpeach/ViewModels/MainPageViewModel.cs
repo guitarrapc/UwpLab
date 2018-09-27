@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
-using SelectedTextSpeach.Models.UseCase;
+using SelectedTextSpeach.Models.UseCases;
 using Windows.UI.Popups;
 
 namespace SelectedTextSpeach.ViewModels

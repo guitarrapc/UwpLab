@@ -4,7 +4,7 @@ using Reactive.Bindings;
 using SelectedTextSpeach.Data.Repositories;
 using SelectedTextSpeach.Models.Entities;
 
-namespace SelectedTextSpeach.Models.UseCase
+namespace SelectedTextSpeach.Models.UseCases
 {
     public interface IStory
     {
