@@ -10,6 +10,24 @@
 
     <Grid>
         <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <CommandBar>
+                <AppBarToggleButton Icon="Shuffle" Label="Shuffle"  />
+                <AppBarToggleButton Icon="RepeatAll" Label="Repeat" />
+                <AppBarSeparator/>
+                <AppBarButton Icon="Back" Label="Back" />
+                <AppBarButton Icon="Stop" Label="Stop" />
+                <AppBarButton Icon="Play" Label="Play" />
+                <AppBarButton Icon="Forward" Label="Forward" />
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Label="Like" />
+                    <AppBarButton Label="Dislike" />
+                </CommandBar.SecondaryCommands>
+
+                <CommandBar.Content>
+                    <TextBlock Text="ChoiseArtifact Page" Margin="12,14"/>
+                </CommandBar.Content>
+            </CommandBar>
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="NavigateBackButton" VerticalAlignment="Top" HorizontalAlignment="Left"
                     IsEnabled="True"
@@ -23,42 +41,45 @@
                     </Button.RenderTransform>
                 </Button>
             </StackPanel>
-            <TextBlock Text="Input Blob Storage ConnectionString"
+            <StackPanel Margin="10">
+
+                <TextBlock Text="Input Blob Storage ConnectionString"
                 Style="{StaticResource CaptionTextBlockStyle}" />
-            <TextBox Margin="5"
+                <TextBox Margin="5"
                 Text="{x:Bind ViewModel.StorageConnectionInput.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="5"
+                <TextBox Margin="5"
                 Text="{x:Bind ViewModel.StorageContainerInput.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <CheckBox x:Name="CheckBlobButtonCheckBox"
+                <CheckBox x:Name="CheckBlobButtonCheckBox"
                       Content="Enable Blob Button"
                       IsChecked="{x:Bind ViewModel.IsCheckBoxChecked.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button x:Name="CheckBlobButton" Margin="10" Content="Get Blob Items"
+                <Button x:Name="CheckBlobButton" Margin="10" Content="Get Blob Items"
                         IsEnabled="{x:Bind ViewModel.IsCheckBoxChecked.Value, Mode=OneWay}"
                         Command="{x:Bind ViewModel.CheckBlobCommand}" />
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="ProjectComboBox"
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox x:Name="ProjectComboBox"
                       Width="200" Margin="5"
                       ItemsSource="{x:Bind ViewModel.Projects}" SelectedItem="{x:Bind ViewModel.SelectedProject.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Project"
                       Header="Projects" PlaceholderText="Pick a Project"/>
-                <ComboBox x:Name="BranchComboBox"
+                    <ComboBox x:Name="BranchComboBox"
                       Width="200" Margin="5"
                       ItemsSource="{x:Bind ViewModel.Branches}" SelectedItem="{x:Bind ViewModel.SelectedBranch.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Branch"
                       Header="Projects" PlaceholderText="Pick a Branch"/>
-                <ComboBox x:Name="ArtifactComboBox"
+                    <ComboBox x:Name="ArtifactComboBox"
                       Width="200" Margin="5"
                       ItemsSource="{x:Bind ViewModel.Artifacts}" SelectedItem="{x:Bind ViewModel.SelectedArtifact.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"
                       Header="Projects" PlaceholderText="Pick a Artifact"/>
-            </StackPanel>
-            <StackPanel>
-                <TextBlock x:Name="ArtifactName"
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock x:Name="ArtifactName"
                     Text="{x:Bind ViewModel.ArtifactName.Value, Mode=OneWay}"
                     Style="{StaticResource CaptionTextBlockStyle}" />
-                <TextBlock x:Name="ArtifactSize"
+                    <TextBlock x:Name="ArtifactSize"
                     Text="{x:Bind ViewModel.ArtifactSize.Value, Mode=OneWay}"
                     Style="{StaticResource CaptionTextBlockStyle}" />
-                <TextBlock x:Name="ArtifactUrl"
+                    <TextBlock x:Name="ArtifactUrl"
                     Text="{x:Bind ViewModel.ArtifactUrl.Value, Mode=OneWay}"
                     Style="{StaticResource CaptionTextBlockStyle}" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Grid>
