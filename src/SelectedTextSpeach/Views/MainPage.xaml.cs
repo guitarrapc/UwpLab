@@ -23,8 +23,7 @@ namespace SelectedTextSpeach.Views
         public MainPage()
         {
             InitializeComponent();
-            // Edit only Instance to show Initial RP Value (by DataContext)
-            DataContext = ViewModel;
+            //DataContext = ViewModel;
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -44,17 +43,6 @@ namespace SelectedTextSpeach.Views
         public async void NavigateChoiceArtifactPage(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(ChoiceArtifactsPage), "hogemoge");
-        }
-
-        private void StorySelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // ListView
-            //var story = storyListView.SelectedItem as StoryEntity;
-            //ViewModel.StorySelectionChanged(story.Title);
-
-            // ComboBox
-            var story = storyComboBox.SelectedItem as StoryEntity;
-            ViewModel.StorySelectionChanged(story.Title);
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)

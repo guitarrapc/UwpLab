@@ -30,8 +30,8 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<string> TextBoxInput { get; }
         public ReactiveProperty<string> PlayIconTextBoxInput { get; }
-        //public ReadOnlyReactiveCollection<string> SpeechTitles { get; }
         public ReadOnlyReactiveCollection<StoryEntity> SpeechTitles { get; }
+        public ReactiveProperty<StoryEntity> SelectedTitle { get; } = new ReactiveProperty<StoryEntity>();
 
         public ReactiveProperty<string> TextBoxSelection { get; }
         public ReactiveProperty<string> PlayIconTextBoxSelection { get; }
@@ -45,6 +45,8 @@ namespace SelectedTextSpeach.ViewModels
                 .ToReadOnlyReactiveProperty();
 
             SpeechTitles = storyModel.AllStories.ToReadOnlyReactiveCollection();
+            SelectedTitle.Subscribe(x => StorySelectionChanged(x?.Title)).AddTo(disposable);
+            SelectedTitle.Value = SpeechTitles.First();
 
             TextBoxInput = new ReactiveProperty<string>(storyModel.InitialStory.Content);
             TextBoxSelection = new ReactiveProperty<string>("");
@@ -80,6 +82,8 @@ namespace SelectedTextSpeach.ViewModels
             }
             else if (!string.IsNullOrWhiteSpace(TextBoxInput.Value))
             {
+                TextBoxInputReader.SetLanguage(SpeechLanugage.en);
+                await TextBoxInputReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
                 await TextBoxInputReader.SetContent(TextBoxInput.Value);
                 TextBoxInputReader.StartReadContent();
                 PlayIconTextBoxInput.Value = pauseIcon;
