@@ -54,11 +54,14 @@ namespace SelectedTextSpeach
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
 
+                // ref : https://www.wintellect.com/handling-the-back-button-in-windows-10-uwp-apps/
                 // Register a handler for BackRequested events and set the visibility of the Back button
                 // for PC : Win + Backspace
                 // Others : Virtual Back button
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
-                rootFrame.PointerPressed += On_PointerPressed;
+                // ref : https://docs.microsoft.com/ja-jp/windows/uwp/design/basics/navigation-history-and-backwards-navigation
+                // Register a handler for Mouse Pointer events
+                rootFrame.PointerPressed += OnPointerPressed;
 
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
                     rootFrame.CanGoBack ?
@@ -135,9 +138,11 @@ namespace SelectedTextSpeach
             }
         }
 
-        private void On_PointerPressed(object sender, PointerRoutedEventArgs e)
+        private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
             // Mouse Back Button Handling
+            // XButton1Pressed is normally backward
+            // XButton2Pressed is normally foward
             var isXButton1Pressed = e.GetCurrentPoint(sender as UIElement).Properties.PointerUpdateKind == PointerUpdateKind.XButton1Pressed;
 
             if (isXButton1Pressed)
