@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -13,10 +12,8 @@ using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels
 {
-    public class ChoiceArtifactViewModel : IDisposable, INotifyPropertyChanged
+    public class ChoiceArtifactViewModel : IDisposable
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private IBlobArtifact usecase = new BlobArtifactUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
