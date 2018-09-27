@@ -59,6 +59,15 @@ namespace SelectedTextSpeach.ViewModels
                 .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
 
+            // Collection's Initial Selection
+            Branches.CollectionChangedAsObservable()
+                .Select(x => x.NewItems)
+                .Where(x => x != null)
+                .Select(x => x.ToList<IBranchArtifactEntity>())
+                .Where(x => x.Any())
+                .Subscribe(x => SelectedBranch.Value = x.First())
+                .AddTo(disposable);
+
             // Next action
             //TODO: Enable Download
             //TODO: Set Download Path
