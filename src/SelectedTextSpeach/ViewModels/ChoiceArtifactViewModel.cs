@@ -69,17 +69,14 @@ namespace SelectedTextSpeach.ViewModels
                 .Do(_ => Artifacts?.Clear())
                 .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
-            ArtifactName = SelectedArtifact
+            SelectedArtifact
                 .Where(x => x != null)
-                .Select(x => x.Name)
-                .ToReactiveProperty();
-            ArtifactSize = SelectedArtifact
-                .Where(x => x != null)
-                .Select(x => x.Size)
-                .ToReactiveProperty();
-            ArtifactUrl = SelectedArtifact
-                .Where(x => x != null)
-                .Select(x => x.Uri.AbsoluteUri)
+                .Do(x =>
+                {
+                    ArtifactName.Value = x.Name;
+                    ArtifactSize.Value = x.Size;
+                    ArtifactUrl.Value = x.Uri.AbsolutePath;
+                })
                 .ToReactiveProperty();
 
             // Collection's Initial Selection
