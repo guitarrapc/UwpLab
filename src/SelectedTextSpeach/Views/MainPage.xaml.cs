@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using SelectedTextSpeach.Data.Entities;
+using SelectedTextSpeach.Models.Entities;
 using SelectedTextSpeach.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Reactive.Bindings;
-using SelectedTextSpeach.Data.Entities;
-using SelectedTextSpeach.Data.Models.Repositories;
+using SelectedTextSpeach.Data.Repositories;
+using SelectedTextSpeach.Models.Entities;
 
-namespace SelectedTextSpeach.Models.Usecase
+namespace SelectedTextSpeach.Models.UseCase
 {
     public interface IStory
     {
@@ -14,14 +14,14 @@ namespace SelectedTextSpeach.Models.Usecase
         void ChangeCurrentStoryByTitle(string title);
     }
 
-    public class HarryPotterStoryUsecase : IStory
+    public class HarryPotterStoryUseCase : IStory
     {
         private readonly IStoryRepository repository;
         public StoryEntity InitialStory { get; }
         public ReactivePropertySlim<StoryEntity> CurrentStory { get; }
         public ObservableCollection<StoryEntity> AllStories { get; }
 
-        public HarryPotterStoryUsecase()
+        public HarryPotterStoryUseCase()
         {
             repository = new StoryRepostiory();
             var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync().Result;

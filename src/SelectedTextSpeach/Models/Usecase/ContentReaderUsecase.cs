@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace SelectedTextSpeach.Models.Usecase
+namespace SelectedTextSpeach.Models.UseCase
 {
     public enum SpeechLanugage
     {
@@ -29,7 +29,7 @@ namespace SelectedTextSpeach.Models.Usecase
     }
 
 
-    public class ContentReaderUsecase : IContentReader
+    public class ContentReaderUseCase : IContentReader
     {
         public Action<object, RoutedEventArgs> SeekCompletedAction { get; set; }
         public bool IsPlaying => MediaElementItem.CurrentState == MediaElementState.Playing;

@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using SelectedTextSpeach.Data.Entities;
+using SelectedTextSpeach.Models.Entities;
 
-namespace SelectedTextSpeach.Data.Models.Repositories
+namespace SelectedTextSpeach.Data.Repositories
 {
     public interface IStoryRepository
     {

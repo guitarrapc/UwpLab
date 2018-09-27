@@ -3,10 +3,10 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Reactive.Bindings;
-using SelectedTextSpeach.Data.Entities;
-using SelectedTextSpeach.Models.Repositories;
+using SelectedTextSpeach.Data.Repositories;
+using SelectedTextSpeach.Models.Entities;
 
-namespace SelectedTextSpeach.Models.Usecase
+namespace SelectedTextSpeach.Models.UseCase
 {
     public interface IBlobArtifact
     {
@@ -17,7 +17,7 @@ namespace SelectedTextSpeach.Models.Usecase
         IArtifactDetailEntity[] GetArtifactCache(string projectName, string branchNam);
     }
 
-    public class BlobArtifactUsecase : IBlobArtifact
+    public class BlobArtifactUseCase : IBlobArtifact
     {
         public ReadOnlyReactivePropertySlim<IArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
         private Subject<IArtifactEntity[]> blobArtifactSubject = new Subject<IArtifactEntity[]>();

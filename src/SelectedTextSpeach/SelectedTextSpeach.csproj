@@ -96,12 +96,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ApplicationSettings.cs" />
-    <Compile Include="Data\Entities\BlobArtifactEntity.cs" />
-    <Compile Include="Models\Usecase\BlobArtifactUsecase.cs" />
-    <Compile Include="Models\Repositories\BlobArtifactRepository.cs" />
-    <Compile Include="Models\Repositories\StoryRepository.cs" />
-    <Compile Include="Models\Usecase\StoryUsecase.cs" />
-    <Compile Include="Data\Entities\StoryEntity.cs" />
+    <Compile Include="Models\Entities\BlobArtifactEntity.cs" />
+    <Compile Include="Models\Usecase\BlobArtifactUseCase.cs" />
+    <Compile Include="Data\Repositories\BlobArtifactRepository.cs" />
+    <Compile Include="Data\Repositories\StoryRepository.cs" />
+    <Compile Include="Models\Usecase\StoryUseCase.cs" />
+    <Compile Include="Models\Entities\StoryEntity.cs" />
     <Compile Include="Helpers\StringsResourcesHelpers.cs" />
     <Compile Include="ViewModels\ChoiceArtifactViewModel.cs" />
     <Compile Include="Views\ChoiceArtifactsPage.xaml.cs">
@@ -110,9 +110,9 @@
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Data\Entities\PersonEntity.cs" />
+    <Compile Include="Models\Entities\PersonEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\Usecase\ContentReaderUsecase.cs" />
+    <Compile Include="Models\Usecase\ContentReaderUseCase.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

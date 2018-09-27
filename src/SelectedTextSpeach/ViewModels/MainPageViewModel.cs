@@ -6,8 +6,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
-using SelectedTextSpeach.Data.Entities;
-using SelectedTextSpeach.Models.Usecase;
+using SelectedTextSpeach.Models.Entities;
+using SelectedTextSpeach.Models.UseCase;
 using Windows.UI.Popups;
 
 namespace SelectedTextSpeach.ViewModels
@@ -16,9 +16,9 @@ namespace SelectedTextSpeach.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly IStory storyModel = new HarryPotterStoryUsecase();
-        private readonly IContentReader TextBoxInputReader = new ContentReaderUsecase();
-        private readonly IContentReader TextBoxSelectionReader = new ContentReaderUsecase();
+        private readonly IStory storyModel = new HarryPotterStoryUseCase();
+        private readonly IContentReader TextBoxInputReader = new ContentReaderUseCase();
+        private readonly IContentReader TextBoxSelectionReader = new ContentReaderUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
 
         private static readonly string playIcon = "\xE768";

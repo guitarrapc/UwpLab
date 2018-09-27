@@ -6,8 +6,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
-using SelectedTextSpeach.Data.Entities;
-using SelectedTextSpeach.Models.Usecase;
+using SelectedTextSpeach.Models.Entities;
+using SelectedTextSpeach.Models.UseCase;
 using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels
@@ -16,7 +16,7 @@ namespace SelectedTextSpeach.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IBlobArtifact usecase = new BlobArtifactUsecase();
+        private IBlobArtifact usecase = new BlobArtifactUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
 
         public ReactiveProperty<string> StorageConnectionInput { get; }
@@ -51,6 +51,7 @@ namespace SelectedTextSpeach.ViewModels
             // Update Collection with Clear existing collection when selected.
             Branches = SelectedProject.Where(x => x != null)
                 .Do(_ => Branches?.Clear())
+                .Do(_ => Artifacts?.Clear())
                 .SelectMany(x => usecase.GetArtifactCache(x.Project))
                 .ToReactiveCollection();
             Artifacts = SelectedBranch.Where(x => x != null)

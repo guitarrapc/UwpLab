@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using SelectedTextSpeach.Data.Entities;
+using SelectedTextSpeach.Models.Entities;
 
-namespace SelectedTextSpeach.Models.Repositories
+namespace SelectedTextSpeach.Data.Repositories
 {
     internal class BlobArtifactRepository
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace SelectedTextSpeach.Data.Entities
+namespace SelectedTextSpeach.Models.Entities
 {
     public interface IArtifactEntity
     {
