@@ -37,7 +37,7 @@ namespace SelectedTextSpeach.Data.Repositories
                     var details = await GetBlobItemsAsync<CloudBlockBlob>(container, xs.Prefix);
                     foreach (var detail in details)
                     {
-                        artifactDetailList.Add(new BlobArtifactDetailEntity(detail.Name, detail.Uri, detail.StreamWriteSizeInBytes));
+                        artifactDetailList.Add(new BlobArtifactDetailEntity(detail.Name, detail.Uri, detail.Properties.Length, detail.Properties.ContentMD5, detail.Properties.LeaseState));
                     }
 
                     var branchName = xs.Prefix.Substring(directory.Prefix.Length, xs.Prefix.Length - directory.Prefix.Length - 1);

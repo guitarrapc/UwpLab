@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Reactive.Bindings;
@@ -31,8 +32,12 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveCollection<IArtifactDetailEntity> Artifacts { get; }
         public ReactiveProperty<IArtifactDetailEntity> SelectedArtifact { get; } = new ReactiveProperty<IArtifactDetailEntity>();
         public ReactiveProperty<string> ArtifactName { get; } = new ReactiveProperty<string>();
-        public ReactiveProperty<int> ArtifactSize { get; } = new ReactiveProperty<int>();
+        public ReactiveProperty<string> ArtifactCaption { get; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ArtifactUrl { get; } = new ReactiveProperty<string>();
+
+        public ReactiveProperty<string> CopyButtonContent { get; }
+        public ReactiveProperty<bool> CopyButtonEnabled { get; }
+        public ReactiveCommand OnClickCopyButton { get; }
 
         public ChoiceArtifactViewModel()
         {
@@ -42,6 +47,18 @@ namespace SelectedTextSpeach.ViewModels
 
             StorageConnectionInput = new ReactiveProperty<string>(blobConnectionString);
             StorageContainerInput = new ReactiveProperty<string>(containerName);
+
+            // Copy Button
+            CopyButtonContent = new ReactiveProperty<string>("Copy");
+            CopyButtonEnabled = ArtifactUrl.Delay(TimeSpan.FromSeconds(1))
+                .Select(x => !string.IsNullOrWhiteSpace(x))
+                .ToReactiveProperty();
+            OnClickCopyButton = CopyButtonEnabled.ToReactiveCommand();
+            OnClickCopyButton
+                .Do(_ => ClipboardHelper.CopyToClipboard(ArtifactUrl.Value))
+                .SelectMany(x => TemporaryDisableCopyButtonAsObservable())
+                .Subscribe()
+                .AddTo(disposable);
 
             // Initialize by obtain artifact informations
             usecase.Artifacts
@@ -71,8 +88,8 @@ namespace SelectedTextSpeach.ViewModels
                 .Do(x =>
                 {
                     ArtifactName.Value = x.Name;
-                    ArtifactSize.Value = x.Size;
-                    ArtifactUrl.Value = x.Uri.AbsolutePath;
+                    ArtifactCaption.Value = $"(Size: {x.Size}, MD5: {x.MD5}, LeaseState: {x.LeaseState})";
+                    ArtifactUrl.Value = x.Uri.AbsoluteUri;
                 })
                 .ToReactiveProperty();
 
@@ -90,6 +107,23 @@ namespace SelectedTextSpeach.ViewModels
             //TODO: Enable Download
             //TODO: Set Download Path
             //TODO: Show Download Detail
+        }
+
+        private IObservable<Unit> TemporaryDisableCopyButtonAsObservable()
+        {
+            // Change ButtonContent a while
+            return Observable.Start(() =>
+            {
+                CopyButtonContent.Value = "Copied!!";
+                CopyButtonEnabled.Value = false;
+            })
+            .Delay(TimeSpan.FromSeconds(1))
+            .Do(__ =>
+            {
+                CopyButtonContent.Value = "Copy";
+                CopyButtonEnabled.Value = true;
+            })
+            .ToUnit();
         }
 
         public void Dispose()

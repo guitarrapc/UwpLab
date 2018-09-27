@@ -1,4 +1,5 @@
 using System;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace SelectedTextSpeach.Models.Entities
 {
@@ -18,7 +19,9 @@ namespace SelectedTextSpeach.Models.Entities
     {
         string Name { set; get; }
         Uri Uri { set; get; }
-        int Size { set; get; }
+        long Size { set; get; }
+        string MD5 { set; get; }
+        LeaseState LeaseState { set; get; }
     }
 
     public struct BlobArtifactEntity : IArtifactEntity
@@ -47,15 +50,19 @@ namespace SelectedTextSpeach.Models.Entities
 
     public struct BlobArtifactDetailEntity : IArtifactDetailEntity
     {
-        public BlobArtifactDetailEntity(string name, Uri uri, int size) : this()
+        public BlobArtifactDetailEntity(string name, Uri uri, long size, string md5, LeaseState leaseState) : this()
         {
             Name = name;
             Uri = uri;
             Size = size;
+            MD5 = md5;
+            LeaseState = leaseState;
         }
 
         public string Name { set; get; }
         public Uri Uri { set; get; }
-        public int Size { set; get; }
+        public long Size { set; get; }
+        public string MD5 { set; get; }
+        public LeaseState LeaseState { set; get; }
     }
 }
