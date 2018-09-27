@@ -8,6 +8,7 @@ using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
 using SelectedTextSpeach.Models.UseCases;
+using Windows.ApplicationModel.DataTransfer;
 using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels
@@ -18,17 +19,23 @@ namespace SelectedTextSpeach.ViewModels
 
         private IBlobArtifact usecase = new BlobArtifactUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
+        private DataPackage dataPackage = new DataPackage();
 
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
-        //TODO: Should change Data Structure.
+        public ReactiveProperty<bool> IsCheckBoxChecked { get; } = new ReactiveProperty<bool>(true);
+        public AsyncReactiveCommand CheckBlobCommand { get; }
+
         public ObservableCollection<IArtifactEntity> Projects { get; } = new ObservableCollection<IArtifactEntity>();
         public ReactiveProperty<IArtifactEntity> SelectedProject { get; } = new ReactiveProperty<IArtifactEntity>();
         public ReactiveCollection<IBranchArtifactEntity> Branches { get; }
         public ReactiveProperty<IBranchArtifactEntity> SelectedBranch { get; } = new ReactiveProperty<IBranchArtifactEntity>();
         public ReactiveCollection<IArtifactDetailEntity> Artifacts { get; }
         public ReactiveProperty<IArtifactDetailEntity> SelectedArtifact { get; } = new ReactiveProperty<IArtifactDetailEntity>();
+        public ReactiveProperty<string> ArtifactName { get; } = new ReactiveProperty<string>();
+        public ReactiveProperty<int> ArtifactSize { get; } = new ReactiveProperty<int>();
+        public ReactiveProperty<string> ArtifactUrl { get; } = new ReactiveProperty<string>();
 
         public ChoiceArtifactViewModel()
         {
@@ -42,10 +49,14 @@ namespace SelectedTextSpeach.ViewModels
             // Initialize by obtain artifact informations
             usecase.Artifacts
                 .Where(x => x != null)
-                .Subscribe(x =>
-                {
-                    x.ForEach(y => Projects.Add(y));
-                })
+                .Do(x => x.ForEach(y => Projects.Add(y)))
+                .Subscribe()
+                .AddTo(disposable);
+
+            // Blob Download
+            CheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
+            CheckBlobCommand
+                .Subscribe(async _ => await usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value))
                 .AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
@@ -58,6 +69,18 @@ namespace SelectedTextSpeach.ViewModels
                 .Do(_ => Artifacts?.Clear())
                 .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
+            ArtifactName = SelectedArtifact
+                .Where(x => x != null)
+                .Select(x => x.Name)
+                .ToReactiveProperty();
+            ArtifactSize = SelectedArtifact
+                .Where(x => x != null)
+                .Select(x => x.Size)
+                .ToReactiveProperty();
+            ArtifactUrl = SelectedArtifact
+                .Where(x => x != null)
+                .Select(x => x.Uri.AbsoluteUri)
+                .ToReactiveProperty();
 
             // Collection's Initial Selection
             Branches.CollectionChangedAsObservable()
@@ -65,19 +88,14 @@ namespace SelectedTextSpeach.ViewModels
                 .Where(x => x != null)
                 .Select(x => x.ToList<IBranchArtifactEntity>())
                 .Where(x => x.Any())
-                .Subscribe(x => SelectedBranch.Value = x.First())
+                .Do(x => SelectedBranch.Value = x.First())
+                .Subscribe()
                 .AddTo(disposable);
 
             // Next action
             //TODO: Enable Download
             //TODO: Set Download Path
             //TODO: Show Download Detail
-            SelectedArtifact.Subscribe().AddTo(disposable);
-        }
-
-        public async void OpenBlob()
-        {
-            await usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
         }
 
         public void Dispose()
