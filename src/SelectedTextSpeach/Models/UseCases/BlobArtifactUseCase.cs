@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure.Storage;
 using Reactive.Bindings;
 using SelectedTextSpeach.Data.Repositories;
 using SelectedTextSpeach.Models.Entities;
+using Windows.System;
 
 namespace SelectedTextSpeach.Models.UseCases
 {
@@ -14,20 +15,25 @@ namespace SelectedTextSpeach.Models.UseCases
     {
         ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts { get; }
         ReadOnlyReactivePropertySlim<string> RequestFailedMessage { get; }
+        ReadOnlyReactivePropertySlim<string> DownloadStatus { get; }
 
         void CancelRequest();
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
+        Task DownloadHoloLensPackagesAsync(string blobConnectionString, string containerName, string blobName, long length, string fileName);
+        Task OpenFolderAsync();
         IArtifactEntity[] GetArtifactCache();
         IBranchArtifactEntity[] GetArtifactCache(string projectName);
         IArtifactDetailEntity[] GetArtifactCache(string projectName, string branchNam);
     }
 
-    public class BlobArtifactSummaryUseCase : IBlobArtifactSummary
+    public class BlobArtifactUseCase : IBlobArtifactSummary
     {
         public ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
         private Subject<IArtifactEntity> blobArtifactSubject = new Subject<IArtifactEntity>();
         public ReadOnlyReactivePropertySlim<string> RequestFailedMessage => blobArtifactFailedSubject.ToReadOnlyReactivePropertySlim();
         private Subject<string> blobArtifactFailedSubject = new Subject<string>();
+        public ReadOnlyReactivePropertySlim<string> DownloadStatus => downloadStatusSubject.ToReadOnlyReactivePropertySlim();
+        private Subject<string> downloadStatusSubject = new Subject<string>();
 
         private ConcurrentBag<IArtifactEntity> caches = null;
         private BlobArtifactRepository repository = null;
@@ -35,6 +41,23 @@ namespace SelectedTextSpeach.Models.UseCases
         public void CancelRequest()
         {
             repository?.Cancel();
+        }
+
+        public async Task DownloadHoloLensPackagesAsync(string blobConnectionString, string containerName, string blobName, long length, string fileName)
+        {
+            downloadStatusSubject.OnNext("Start downloading.");
+            repository = new BlobArtifactRepository(blobConnectionString);
+            var result = await repository.DownloadBlobArtifactAsync(containerName, blobName, length);
+            var folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            var file = await folder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.GenerateUniqueName);
+            await Windows.Storage.FileIO.WriteBytesAsync(file, result);
+            downloadStatusSubject.OnNext("Complete download!");
+        }
+
+        public async Task OpenFolderAsync()
+        {
+            var folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            await Launcher.LaunchFolderAsync(folder);
         }
 
         public async Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName)

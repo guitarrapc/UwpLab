@@ -21,14 +21,15 @@ namespace SelectedTextSpeach.Data.Repositories
             this.blobStorageConnection = blobStorageConnection;
         }
 
-        public async Task DownloadBlobArtifactAsync(string containerName, string blobName, long length)
+        public async Task<byte[]> DownloadBlobArtifactAsync(string containerName, string blobName, long length)
         {
             var storageClient = CloudStorageAccount.Parse(blobStorageConnection);
             var blobClient = storageClient.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
-            var blob = container.GetAppendBlobReference(blobName);
+            var blob = container.GetBlockBlobReference(blobName);
             var bytes = new byte[length];
             await blob.DownloadToByteArrayAsync(bytes, 0);
+            return bytes;
         }
 
         public async Task<IArtifactEntity[]> ListBlobArtifactsAsync(string containerName)
@@ -52,7 +53,7 @@ namespace SelectedTextSpeach.Data.Repositories
                     var details = await ListBlobItemsAsync<CloudBlockBlob>(container, xs.Prefix);
                     foreach (var detail in details)
                     {
-                        artifactDetailList.Add(new BlobArtifactDetailEntity(detail.Name, detail.Uri, detail.Properties.Length, detail.Properties.ContentMD5, detail.Properties.LeaseState));
+                        artifactDetailList.Add(new BlobArtifactDetailEntity(detail.Name, detail.Uri.Segments.Last(), detail.Uri, detail.Properties.Length, detail.Properties.ContentMD5, detail.Properties.LeaseState));
                     }
 
                     var branchName = xs.Prefix.Substring(directory.Prefix.Length, xs.Prefix.Length - directory.Prefix.Length - 1);

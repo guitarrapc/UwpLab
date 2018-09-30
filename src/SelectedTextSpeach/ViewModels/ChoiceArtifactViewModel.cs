@@ -14,7 +14,7 @@ namespace SelectedTextSpeach.ViewModels
 {
     public class ChoiceArtifactViewModel : IDisposable
     {
-        private IBlobArtifactSummary usecase = new BlobArtifactSummaryUseCase();
+        private IBlobArtifactSummary usecase = new BlobArtifactUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
 
@@ -22,9 +22,9 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveProperty<string> StorageContainerInput { get; }
 
         public ReactiveProperty<bool> IsCheckBoxChecked { get; } = new ReactiveProperty<bool>(true);
-        public AsyncReactiveCommand CheckBlobCommand { get; }
+        public AsyncReactiveCommand OnClickCheckBlobCommand { get; }
         public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
-        public ReactiveCommand CancelBlobCommand { get; }
+        public ReactiveCommand OnClickCancelBlobCommand { get; }
         public ReactiveProperty<string> BlobResult { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ComboBoxEnabled { get; set; }
 
@@ -40,7 +40,11 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<string> CopyButtonContent { get; }
         public ReactiveProperty<bool> CopyButtonEnabled { get; }
-        public ReactiveCommand OnClickCopyButton { get; }
+        public ReactiveCommand OnClickCopyCommand { get; }
+
+        public AsyncReactiveCommand OnClickDownloadCommand { get; }
+        public ReactiveProperty<string> DownloadStatus { get; } = new ReactiveProperty<string>();
+        public AsyncReactiveCommand OnClickOpenDownloadFolderCommand { get; } = new AsyncReactiveCommand();
 
         public ChoiceArtifactViewModel()
         {
@@ -53,15 +57,23 @@ namespace SelectedTextSpeach.ViewModels
 
             // Copy Button
             CopyButtonContent = new ReactiveProperty<string>("Copy");
-            CopyButtonEnabled = ArtifactUrl.Delay(TimeSpan.FromSeconds(1))
-                .Select(x => !string.IsNullOrWhiteSpace(x))
-                .ToReactiveProperty();
-            OnClickCopyButton = CopyButtonEnabled.ToReactiveCommand();
-            OnClickCopyButton
+            CopyButtonEnabled = ArtifactUrl.Select(x => !string.IsNullOrWhiteSpace(x)).ToReactiveProperty();
+            OnClickCopyCommand = CopyButtonEnabled.ToReactiveCommand();
+            OnClickCopyCommand
                 .Do(_ => ClipboardHelper.CopyToClipboard(ArtifactUrl.Value))
                 .SelectMany(x => TemporaryDisableCopyButtonAsObservable())
                 .Subscribe()
                 .AddTo(disposable);
+
+            // Download Button
+            usecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
+            OnClickDownloadCommand = CopyButtonEnabled.ToAsyncReactiveCommand();
+            OnClickDownloadCommand
+                .Subscribe(async _ => await usecase.DownloadHoloLensPackagesAsync(blobConnectionString, containerName, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
+                .AddTo(disposable);
+
+            // OpenFolder Button
+            OnClickOpenDownloadFolderCommand.Subscribe(_ => usecase.OpenFolderAsync()).AddTo(disposable);
 
             // Initialize by obtain artifact informations
             usecase.Artifacts
@@ -80,8 +92,8 @@ namespace SelectedTextSpeach.ViewModels
 
             // Blob Download
             ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
-            CheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
-            CheckBlobCommand.Subscribe(async _ =>
+            OnClickCheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
+            OnClickCheckBlobCommand.Subscribe(async _ =>
             {
                 var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
                 Projects.Clear();
@@ -92,8 +104,8 @@ namespace SelectedTextSpeach.ViewModels
                 IsCheckBlobCompleted.Value = true;
             })
             .AddTo(disposable);
-            CancelBlobCommand = IsCheckBoxChecked.Select(x => !x).ToReactiveCommand();
-            CancelBlobCommand.Subscribe(_ => usecase.CancelRequest()).AddTo(disposable);
+            OnClickCancelBlobCommand = IsCheckBoxChecked.Select(x => !x).ToReactiveCommand();
+            OnClickCancelBlobCommand.Subscribe(_ => usecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
             Branches = SelectedProject.Where(x => x != null)
@@ -116,9 +128,8 @@ namespace SelectedTextSpeach.ViewModels
                 .ToReactiveProperty();
 
             // Next action
-            //TODO: Enable Download
-            //TODO: Set Download Path
-            //TODO: Show Download Detail
+            // TODO : Cancel Download
+            // TODO : Multiple Download?
         }
 
         private IObservable<Unit> TemporaryDisableCopyButtonAsObservable()
@@ -129,7 +140,7 @@ namespace SelectedTextSpeach.ViewModels
                 CopyButtonContent.Value = "Copied!!";
                 CopyButtonEnabled.Value = false;
             })
-            .Delay(TimeSpan.FromSeconds(1))
+            .Delay(TimeSpan.FromMilliseconds(500))
             .Do(__ =>
             {
                 CopyButtonContent.Value = "Copy";

@@ -18,6 +18,7 @@ namespace SelectedTextSpeach.Models.Entities
     public interface IArtifactDetailEntity
     {
         string Name { set; get; }
+        string FileName { set; get; }
         Uri Uri { set; get; }
         long Size { set; get; }
         string MD5 { set; get; }
@@ -50,9 +51,10 @@ namespace SelectedTextSpeach.Models.Entities
 
     public struct BlobArtifactDetailEntity : IArtifactDetailEntity
     {
-        public BlobArtifactDetailEntity(string name, Uri uri, long size, string md5, LeaseState leaseState) : this()
+        public BlobArtifactDetailEntity(string name, string fileName, Uri uri, long size, string md5, LeaseState leaseState) : this()
         {
             Name = name;
+            FileName = fileName;
             Uri = uri;
             Size = size;
             MD5 = md5;
@@ -60,6 +62,7 @@ namespace SelectedTextSpeach.Models.Entities
         }
 
         public string Name { set; get; }
+        public string FileName { set; get; }
         public Uri Uri { set; get; }
         public long Size { set; get; }
         public string MD5 { set; get; }

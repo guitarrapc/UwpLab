@@ -57,7 +57,7 @@
                     <Button
                         x:Name="CheckBlobButton"
                         Margin="10"
-                        Command="{x:Bind Path=ViewModel.CheckBlobCommand}"
+                        Command="{x:Bind Path=ViewModel.OnClickCheckBlobCommand}"
                         Content="Get Blob Items"
                         IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.IsCheckBoxChecked.Value}" />
                     <CheckBox
@@ -68,11 +68,12 @@
                     <Button
                         x:Name="CancelBlobButton"
                         Margin="10"
-                        Command="{x:Bind Path=ViewModel.CancelBlobCommand}"
+                        Command="{x:Bind Path=ViewModel.OnClickCancelBlobCommand}"
                         Content="Cancel" />
                     <TextBlock
                         x:Name="CheckBlobResult"
                         Margin="10"
+                        Style="{StaticResource CaptionTextBlockStyle}"
                         Text="{x:Bind ViewModel.BlobResult.Value, Mode=OneWay}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
@@ -108,7 +109,7 @@
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedArtifact.Value, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
                 <StackPanel>
-                    <Grid Margin="0,5,0,5">
+                    <Grid Margin="5,5,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="88" />
@@ -123,7 +124,7 @@
                             x:Name="Copy"
                             Grid.Column="1"
                             Width="88"
-                            Command="{x:Bind ViewModel.OnClickCopyButton}"
+                            Command="{x:Bind ViewModel.OnClickCopyCommand}"
                             Content="{x:Bind ViewModel.CopyButtonContent.Value, Mode=OneWay}"
                             IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />
                     </Grid>
@@ -132,6 +133,23 @@
                         Style="{StaticResource CaptionTextBlockStyle}"
                         Text="{x:Bind Mode=OneWay, Path=ViewModel.ArtifactCaption.Value}" />
                 </StackPanel>
+                <StackPanel Margin="10" Orientation="Horizontal">
+                    <Button
+                        x:Name="DownloadBlobButton"
+                        Command="{x:Bind Path=ViewModel.OnClickDownloadCommand}"
+                        Content="Download"
+                        IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />
+                    <TextBlock
+                        x:Name="DownloadStatus"
+                        Margin="10"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{x:Bind Mode=OneWay, Path=ViewModel.DownloadStatus.Value}" />
+                </StackPanel>
+                <Button
+                    x:Name="OpenDownloadFolder"
+                    Margin="10"
+                    Command="{x:Bind Path=ViewModel.OnClickOpenDownloadFolderCommand}"
+                    Content="Open Folder" />
             </StackPanel>
         </StackPanel>
     </Grid>
