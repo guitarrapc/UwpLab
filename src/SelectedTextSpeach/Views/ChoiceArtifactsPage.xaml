@@ -50,21 +50,26 @@
                 </Button>
             </StackPanel>
             <StackPanel Margin="10">
-
                 <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage ConnectionString" />
                 <TextBox Margin="5" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBox Margin="5" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
-                <CheckBox
-                    x:Name="CheckBlobButtonCheckBox"
-                    Margin="10"
-                    Content="Enable Blob Button"
-                    IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.IsCheckBoxChecked.Value, UpdateSourceTrigger=PropertyChanged}" />
-                <Button
-                    x:Name="CheckBlobButton"
-                    Margin="10"
-                    Command="{x:Bind Path=ViewModel.CheckBlobCommand}"
-                    Content="Get Blob Items"
-                    IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.IsCheckBoxChecked.Value}" />
+                <StackPanel Orientation="Horizontal">
+                    <Button
+                        x:Name="CheckBlobButton"
+                        Margin="10"
+                        Command="{x:Bind Path=ViewModel.CheckBlobCommand}"
+                        Content="Get Blob Items"
+                        IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.IsCheckBoxChecked.Value}" />
+                    <CheckBox
+                        x:Name="CheckBlobButtonCheckBox"
+                        Margin="10"
+                        Content="Enable Blob Button"
+                        IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.IsCheckBoxChecked.Value, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock
+                        x:Name="CheckBlobResult"
+                        Margin="10"
+                        Text="{x:Bind ViewModel.BlobResult.Value, Mode=OneWay}" />
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <ComboBox
                         x:Name="ProjectComboBox"
@@ -72,6 +77,7 @@
                         Margin="5"
                         DisplayMemberPath="Project"
                         Header="Projects"
+                        IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
                         ItemsSource="{x:Bind Path=ViewModel.Projects}"
                         PlaceholderText="Pick a Project"
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedProject.Value, UpdateSourceTrigger=PropertyChanged}" />
@@ -81,6 +87,7 @@
                         Margin="5"
                         DisplayMemberPath="Branch"
                         Header="Projects"
+                        IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
                         ItemsSource="{x:Bind Path=ViewModel.Branches}"
                         PlaceholderText="Pick a Branch"
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedBranch.Value, UpdateSourceTrigger=PropertyChanged}" />
@@ -90,6 +97,7 @@
                         Margin="5"
                         DisplayMemberPath="Name"
                         Header="Projects"
+                        IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
                         ItemsSource="{x:Bind Path=ViewModel.Artifacts}"
                         PlaceholderText="Pick a Artifact"
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedArtifact.Value, UpdateSourceTrigger=PropertyChanged}" />
@@ -103,6 +111,7 @@
                         <TextBox
                             x:Name="ArtifactUrl"
                             Grid.Column="0"
+                            IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
                             IsReadOnly="True"
                             Text="{x:Bind Mode=OneWay, Path=ViewModel.ArtifactUrl.Value}" />
                         <Button

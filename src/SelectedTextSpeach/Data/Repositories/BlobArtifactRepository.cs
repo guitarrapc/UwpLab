@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace SelectedTextSpeach.Data.Repositories
 {
     internal class BlobArtifactRepository
     {
+        public Action<IArtifactEntity> OnGetEachArtifact { get; set; }
         private string blobStorageConnection;
 
         public BlobArtifactRepository(string blobStorageConnection)
@@ -45,7 +47,9 @@ namespace SelectedTextSpeach.Data.Repositories
                 }));
 
                 var projectName = directory.Prefix.Substring(0, directory.Prefix.Length - 1);
-                artifactList.Add(new BlobArtifactEntity(projectName, branchArtifactList.ToArray()));
+                var artifact = new BlobArtifactEntity(projectName, branchArtifactList.ToArray());
+                artifactList.Add(artifact);
+                OnGetEachArtifact?.Invoke(artifact);
             };
 
             return artifactList.ToArray();

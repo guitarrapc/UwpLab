@@ -9,7 +9,6 @@ using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
 using SelectedTextSpeach.Models.UseCases;
 using Windows.ApplicationModel.DataTransfer;
-using WinRTXamlToolkit.Tools;
 
 namespace SelectedTextSpeach.ViewModels
 {
@@ -24,6 +23,9 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<bool> IsCheckBoxChecked { get; } = new ReactiveProperty<bool>(true);
         public AsyncReactiveCommand CheckBlobCommand { get; }
+        public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<string> BlobResult { get; set; } = new ReactiveProperty<string>();
+        public ReactiveProperty<bool> ComboBoxEnabled { get; set; }
 
         public ObservableCollection<IArtifactEntity> Projects { get; } = new ObservableCollection<IArtifactEntity>();
         public ReactiveProperty<IArtifactEntity> SelectedProject { get; } = new ReactiveProperty<IArtifactEntity>();
@@ -63,14 +65,32 @@ namespace SelectedTextSpeach.ViewModels
             // Initialize by obtain artifact informations
             usecase.Artifacts
                 .Where(x => x != null)
-                .Do(x => x.ForEach(y => Projects.Add(y)))
+                .Do(x =>
+                {
+                    Projects.Add(x);
+                    BlobResult.Value = $"Found {Projects.Count} projects.";
+                })
+                .Subscribe()
+                .AddTo(disposable);
+            usecase.RequestFailedMessage
+                .Do(x => BlobResult.Value = x)
                 .Subscribe()
                 .AddTo(disposable);
 
             // Blob Download
+            ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
             CheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
             CheckBlobCommand
-                .Subscribe(async _ => await usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value))
+                .Subscribe(async _ =>
+                {
+                    var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
+                    Projects.Clear();
+                    Branches?.Clear();
+                    Artifacts?.Clear();
+                    BlobResult.Value = "Trying obtain project infomations.";
+                    await task;
+                    IsCheckBlobCompleted.Value = true;
+                })
                 .AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
@@ -80,7 +100,7 @@ namespace SelectedTextSpeach.ViewModels
                 .SelectMany(x => usecase.GetArtifactCache(x.Project))
                 .ToReactiveCollection();
             Artifacts = SelectedBranch.Where(x => x != null)
-                .Do(_ => Artifacts?.Clear())
+                .Do(x => Artifacts?.Clear())
                 .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
             SelectedArtifact
@@ -92,16 +112,6 @@ namespace SelectedTextSpeach.ViewModels
                     ArtifactUrl.Value = x.Uri.AbsoluteUri;
                 })
                 .ToReactiveProperty();
-
-            // Collection's Initial Selection
-            Branches.CollectionChangedAsObservable()
-                .Select(x => x.NewItems)
-                .Where(x => x != null)
-                .Select(x => x.ToList<IBranchArtifactEntity>())
-                .Where(x => x.Any())
-                .Do(x => SelectedBranch.Value = x.First())
-                .Subscribe()
-                .AddTo(disposable);
 
             // Next action
             //TODO: Enable Download

@@ -10,7 +10,8 @@ namespace SelectedTextSpeach.Models.UseCases
 {
     public interface IBlobArtifact
     {
-        ReadOnlyReactivePropertySlim<IArtifactEntity[]> Artifacts { get; }
+        ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts { get; }
+        ReadOnlyReactivePropertySlim<string> RequestFailedMessage { get; }
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
         IArtifactEntity[] GetArtifactCache();
         IBranchArtifactEntity[] GetArtifactCache(string projectName);
@@ -19,8 +20,10 @@ namespace SelectedTextSpeach.Models.UseCases
 
     public class BlobArtifactUseCase : IBlobArtifact
     {
-        public ReadOnlyReactivePropertySlim<IArtifactEntity[]> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
-        private Subject<IArtifactEntity[]> blobArtifactSubject = new Subject<IArtifactEntity[]>();
+        public ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
+        private Subject<IArtifactEntity> blobArtifactSubject = new Subject<IArtifactEntity>();
+        public ReadOnlyReactivePropertySlim<string> RequestFailedMessage => blobArtifactFailedSubject.ToReadOnlyReactivePropertySlim();
+        private Subject<string> blobArtifactFailedSubject = new Subject<string>();
 
         private IArtifactEntity[] cache = Array.Empty<IArtifactEntity>();
 
@@ -28,16 +31,16 @@ namespace SelectedTextSpeach.Models.UseCases
         {
             try
             {
-                var repository = new BlobArtifactRepository(blobConnectionString);
+                var repository = new BlobArtifactRepository(blobConnectionString)
+                {
+                    OnGetEachArtifact = artifact => blobArtifactSubject.OnNext(artifact),
+                };
                 var entities = await repository.GetBlobArtifactsAsync(containerName);
-                blobArtifactSubject.OnNext(entities);
                 cache = entities;
             }
             catch (Exception ex)
             {
-                //TODO: Error Handling
-                System.Diagnostics.Debug.WriteLine(ex);
-                blobArtifactSubject.OnNext(null);
+                blobArtifactFailedSubject.OnNext($"Error: {ex.Message}");
             }
         }
 
