@@ -21,7 +21,7 @@ namespace SelectedTextSpeach.Models.UseCases
         bool IsStopped { get; }
 
         void SetLanguage(SpeechLanugage language);
-        Task SetVoice(VoiceGender gender);
+        void SetVoice(VoiceGender gender);
         Task SetContent(string content);
         void StartReadContent();
         void StopReadContent();
@@ -55,7 +55,7 @@ namespace SelectedTextSpeach.Models.UseCases
                     break;
             }
         }
-        public async Task SetVoice(VoiceGender gender)
+        public void SetVoice(VoiceGender gender)
         {
             var genders = SpeechSynthesizer.AllVoices.Where(x => x.Gender == gender);
             if (genders.Any(x => x.Language == language))

@@ -83,7 +83,7 @@ namespace SelectedTextSpeach.ViewModels
             else if (!string.IsNullOrWhiteSpace(TextBoxInput.Value))
             {
                 TextBoxInputReader.SetLanguage(SpeechLanugage.en);
-                await TextBoxInputReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
+                TextBoxInputReader.SetVoice(Windows.Media.SpeechSynthesis.VoiceGender.Female);
                 await TextBoxInputReader.SetContent(TextBoxInput.Value);
                 TextBoxInputReader.StartReadContent();
                 PlayIconTextBoxInput.Value = pauseIcon;
