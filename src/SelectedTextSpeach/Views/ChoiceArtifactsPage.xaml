@@ -65,6 +65,11 @@
                         Margin="10"
                         Content="Enable Blob Button"
                         IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.IsCheckBoxChecked.Value, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button
+                        x:Name="CancelBlobButton"
+                        Margin="10"
+                        Command="{x:Bind Path=ViewModel.CancelBlobCommand}"
+                        Content="Cancel" />
                     <TextBlock
                         x:Name="CheckBlobResult"
                         Margin="10"

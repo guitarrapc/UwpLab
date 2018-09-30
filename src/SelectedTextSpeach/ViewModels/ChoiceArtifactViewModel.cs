@@ -14,7 +14,7 @@ namespace SelectedTextSpeach.ViewModels
 {
     public class ChoiceArtifactViewModel : IDisposable
     {
-        private IBlobArtifact usecase = new BlobArtifactUseCase();
+        private IBlobArtifactSummary usecase = new BlobArtifactSummaryUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
 
@@ -24,6 +24,7 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveProperty<bool> IsCheckBoxChecked { get; } = new ReactiveProperty<bool>(true);
         public AsyncReactiveCommand CheckBlobCommand { get; }
         public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
+        public ReactiveCommand CancelBlobCommand { get; }
         public ReactiveProperty<string> BlobResult { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ComboBoxEnabled { get; set; }
 
@@ -80,18 +81,19 @@ namespace SelectedTextSpeach.ViewModels
             // Blob Download
             ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
             CheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
-            CheckBlobCommand
-                .Subscribe(async _ =>
-                {
-                    var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
-                    Projects.Clear();
-                    Branches?.Clear();
-                    Artifacts?.Clear();
-                    BlobResult.Value = "Trying obtain project infomations.";
-                    await task;
-                    IsCheckBlobCompleted.Value = true;
-                })
-                .AddTo(disposable);
+            CheckBlobCommand.Subscribe(async _ =>
+            {
+                var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
+                Projects.Clear();
+                Branches?.Clear();
+                Artifacts?.Clear();
+                BlobResult.Value = "Trying obtain project infomations.";
+                await task;
+                IsCheckBlobCompleted.Value = true;
+            })
+            .AddTo(disposable);
+            CancelBlobCommand = IsCheckBoxChecked.Select(x => !x).ToReactiveCommand();
+            CancelBlobCommand.Subscribe(_ => usecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
             Branches = SelectedProject.Where(x => x != null)
