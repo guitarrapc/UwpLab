@@ -97,12 +97,14 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ApplicationSettings.cs" />
+    <Compile Include="Data\Repositories\BlobApplicationDataContainerRepository.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Helpers\ClipboardHelper.cs" />
     <Compile Include="Models\Entities\BlobArtifactEntity.cs" />
     <Compile Include="Models\UseCases\BlobArtifactUseCase.cs" />
     <Compile Include="Data\Repositories\BlobArtifactRepository.cs" />
     <Compile Include="Data\Repositories\StoryRepository.cs" />
+    <Compile Include="Models\UseCases\BlobConnectionUseCase.cs" />
     <Compile Include="Models\UseCases\StoryUseCase.cs" />
     <Compile Include="Models\Entities\StoryEntity.cs" />
     <Compile Include="Helpers\StringsResourcesHelpers.cs" />

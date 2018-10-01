@@ -16,9 +16,10 @@ namespace SelectedTextSpeach.ViewModels
     public class ChoiceArtifactViewModel : IDisposable
     {
         private static readonly string ExpandButtonLabel = "\xE710";     // + sign
-        private static readonly string CollapseButtonLabel = "\xE738";   // -+ sign
+        private static readonly string CollapseButtonLabel = "\xE738";   // - sign
 
-        private IBlobArtifactSummary usecase = new BlobArtifactUseCase();
+        private IBlobArtifactSummary blobArtifactSummaryUsecase = new BlobArtifactUseCase();
+        private IBlobConnectionUseCase blobConnectionUseCase = new BlobConnectionUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
 
@@ -56,9 +57,6 @@ namespace SelectedTextSpeach.ViewModels
         public ChoiceArtifactViewModel()
         {
             // Storage Credential Input
-            var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            var storageSettings = settings.CreateContainer("azureBlobSettings", Windows.Storage.ApplicationDataCreateDisposition.Always);
-
             ShowHideStorageCredentialsButtonLabel = new ReactiveProperty<string>();
             ShowHideStorageCredentialsCommand.Subscribe(_ =>
             {
@@ -69,10 +67,10 @@ namespace SelectedTextSpeach.ViewModels
                     ? Visibility.Visible
                     : Visibility.Collapsed;
             }).AddTo(disposable);
-            StorageConnectionInput = new ReactiveProperty<string>((string)storageSettings.Values["blob_connection_string"]);
-            StorageConnectionInput.Subscribe(x => storageSettings.Values["blob_connection_string"] = x).AddTo(disposable);
-            StorageContainerInput = new ReactiveProperty<string>((string)storageSettings.Values["container"]);
-            StorageContainerInput.Subscribe(x => storageSettings.Values["container"] = x).AddTo(disposable);
+            StorageConnectionInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("blob_connection_string"));
+            StorageConnectionInput.Subscribe(x => blobConnectionUseCase.Save("blob_connection_string", x)).AddTo(disposable);
+            StorageContainerInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("container"));
+            StorageContainerInput.Subscribe(x => blobConnectionUseCase.Save("container", x)).AddTo(disposable);
 
             // Copy Button
             CopyButtonContent = new ReactiveProperty<string>("Copy");
@@ -85,17 +83,17 @@ namespace SelectedTextSpeach.ViewModels
                 .AddTo(disposable);
 
             // Download Button
-            usecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
+            blobArtifactSummaryUsecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
             OnClickDownloadCommand = CopyButtonEnabled.ToAsyncReactiveCommand();
             OnClickDownloadCommand
-                .Subscribe(async _ => await usecase.DownloadHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
+                .Subscribe(async _ => await blobArtifactSummaryUsecase.DownloadHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
                 .AddTo(disposable);
 
             // OpenFolder Button
-            OnClickOpenDownloadFolderCommand.Subscribe(_ => usecase.OpenFolderAsync()).AddTo(disposable);
+            OnClickOpenDownloadFolderCommand.Subscribe(_ => blobArtifactSummaryUsecase.OpenFolderAsync()).AddTo(disposable);
 
             // Initialize by obtain artifact informations
-            usecase.Artifacts
+            blobArtifactSummaryUsecase.Artifacts
                 .Where(x => x != null)
                 .Do(x =>
                 {
@@ -104,7 +102,7 @@ namespace SelectedTextSpeach.ViewModels
                 })
                 .Subscribe()
                 .AddTo(disposable);
-            usecase.RequestFailedMessage
+            blobArtifactSummaryUsecase.RequestFailedMessage
                 .Do(x => BlobResult.Value = x)
                 .Subscribe()
                 .AddTo(disposable);
@@ -114,7 +112,7 @@ namespace SelectedTextSpeach.ViewModels
             OnClickCheckBlobCommand = IsDownaloadable.ToAsyncReactiveCommand();
             OnClickCheckBlobCommand.Subscribe(async _ =>
             {
-                var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
+                var task = blobArtifactSummaryUsecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
                 Projects.Clear();
                 Branches?.Clear();
                 Artifacts?.Clear();
@@ -124,17 +122,17 @@ namespace SelectedTextSpeach.ViewModels
             })
             .AddTo(disposable);
             OnClickCancelBlobCommand = IsDownaloadable.Select(x => !x).ToReactiveCommand();
-            OnClickCancelBlobCommand.Subscribe(_ => usecase.CancelRequest()).AddTo(disposable);
+            OnClickCancelBlobCommand.Subscribe(_ => blobArtifactSummaryUsecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
             Branches = SelectedProject.Where(x => x != null)
                 .Do(_ => Branches?.Clear())
                 .Do(_ => Artifacts?.Clear())
-                .SelectMany(x => usecase.GetArtifactCache(x.Project))
+                .SelectMany(x => blobArtifactSummaryUsecase.GetArtifactCache(x.Project))
                 .ToReactiveCollection();
             Artifacts = SelectedBranch.Where(x => x != null)
                 .Do(x => Artifacts?.Clear())
-                .SelectMany(x => usecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
+                .SelectMany(x => blobArtifactSummaryUsecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
             SelectedArtifact
                 .Where(x => x != null)
