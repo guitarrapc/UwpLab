@@ -32,7 +32,7 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReadOnlyReactiveProperty<bool> IsEnableCheckBlobButton { get; }
         public AsyncReactiveCommand OnClickCheckBlobCommand { get; }
-        public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<bool> IsBlobChecking { get; } = new ReactiveProperty<bool>();
         public ReactiveCommand OnClickCancelBlobCommand { get; } = new ReactiveCommand();
         public ReactiveProperty<string> BlobResult { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ComboBoxEnabled { get; set; }
@@ -119,12 +119,13 @@ namespace SelectedTextSpeach.ViewModels
             OnClickCheckBlobCommand.Subscribe(async _ =>
             {
                 var task = blobArtifactUsecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
+                IsBlobChecking.Value = true;
                 Projects.Clear();
                 Branches?.Clear();
                 Artifacts?.Clear();
                 BlobResult.Value = "Trying obtain project infomations.";
                 await task;
-                IsCheckBlobCompleted.Value = true;
+                IsBlobChecking.Value = false;
             })
             .AddTo(disposable);
             OnClickCancelBlobCommand = IsEnableCheckBlobButton.Select(x => !x).ToReactiveCommand();

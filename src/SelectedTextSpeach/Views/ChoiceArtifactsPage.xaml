@@ -73,8 +73,17 @@
                 <StackPanel Margin="10,5,0,0" Visibility="{x:Bind ViewModel.ShowBlobSectionVisibility.Value, Mode=OneWay}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage ConnectionString" />
-                        <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox
+                            Width="600"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left"
+                            Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage Container name" />
+                        <TextBox
+                            Width="600"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left"
+                            Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                     <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                         <Button
@@ -89,9 +98,11 @@
                             Margin="5,0,0,0"
                             Command="{x:Bind Path=ViewModel.OnClickCancelBlobCommand}"
                             Content="Cancel" />
+                        <ProgressRing Margin="5,0,0,0" IsActive="{x:Bind ViewModel.IsBlobChecking.Value, Mode=OneWay}" />
                         <TextBlock
                             x:Name="CheckBlobResult"
                             Margin="5,0,0,0"
+                            VerticalAlignment="Center"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="{x:Bind ViewModel.BlobResult.Value, Mode=OneWay}" />
                     </StackPanel>
