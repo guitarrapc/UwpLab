@@ -61,7 +61,7 @@ namespace SelectedTextSpeach.ViewModels
             OnClickCopyCommand = CopyButtonEnabled.ToReactiveCommand();
             OnClickCopyCommand
                 .Do(_ => ClipboardHelper.CopyToClipboard(ArtifactUrl.Value))
-                .SelectMany(x => TemporaryDisableCopyButtonAsObservable())
+                .SelectMany(x => TemporaryDisableCopyButtonAsObservable(TimeSpan.FromMilliseconds(500)))
                 .Subscribe()
                 .AddTo(disposable);
 
@@ -132,7 +132,7 @@ namespace SelectedTextSpeach.ViewModels
             // TODO : Multiple Download?
         }
 
-        private IObservable<Unit> TemporaryDisableCopyButtonAsObservable()
+        private IObservable<Unit> TemporaryDisableCopyButtonAsObservable(TimeSpan duration)
         {
             // Change ButtonContent a while
             return Observable.Start(() =>
@@ -140,7 +140,7 @@ namespace SelectedTextSpeach.ViewModels
                 CopyButtonContent.Value = "Copied!!";
                 CopyButtonEnabled.Value = false;
             })
-            .Delay(TimeSpan.FromMilliseconds(500))
+            .Delay(duration)
             .Do(__ =>
             {
                 CopyButtonContent.Value = "Copy";
