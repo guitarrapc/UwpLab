@@ -50,12 +50,11 @@
                 </Button>
             </StackPanel>
             <StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
                     <Button
                         x:Name="showBlobSection"
                         Width="26"
                         Height="26"
-                        Margin="10,0,0,0"
                         Background="White"
                         BorderBrush="Black"
                         BorderThickness="1"
@@ -71,34 +70,13 @@
                         Style="{StaticResource CaptionTextBlockStyle}"
                         Text="Show/Hide Blob section." />
                 </StackPanel>
-                <StackPanel Margin="10,10,0,0" Visibility="{x:Bind ViewModel.ShowBlobSectionVisibility.Value, Mode=OneWay}">
-                    <StackPanel Orientation="Horizontal">
-                        <Button
-                            x:Name="showHideCredentials"
-                            Width="26"
-                            Height="26"
-                            Margin="10,0,0,0"
-                            Background="White"
-                            BorderBrush="Black"
-                            BorderThickness="1"
-                            Command="{x:Bind Path=ViewModel.ShowHideStorageCredentialsCommand}"
-                            Content="{x:Bind ViewModel.ShowHideStorageCredentialsButtonLabel.Value, Mode=OneWay}"
-                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                            FontSize="8"
-                            FontWeight="Bold"
-                            ToolTipService.ToolTip="Show or hide the storage credentials" />
-                        <TextBlock
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Show/Hide Storage Credential input section." />
-                    </StackPanel>
-                    <StackPanel Margin="10,0,0,0" Visibility="{x:Bind ViewModel.ShowStorageCredentialVisibility.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel Margin="10,5,0,0" Visibility="{x:Bind ViewModel.ShowBlobSectionVisibility.Value, Mode=OneWay}">
+                    <StackPanel>
                         <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage ConnectionString" />
                         <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
-                    <StackPanel Margin="10,5,0,0" Orientation="Horizontal">
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                         <Button
                             x:Name="CheckBlobButton"
                             Width="150"
@@ -112,10 +90,11 @@
                             Content="Cancel" />
                         <TextBlock
                             x:Name="CheckBlobResult"
+                            Margin="5,0,0,0"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="{x:Bind ViewModel.BlobResult.Value, Mode=OneWay}" />
                     </StackPanel>
-                    <StackPanel Margin="5" Orientation="Horizontal">
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                         <ComboBox
                             x:Name="ProjectComboBox"
                             Width="150"
@@ -146,7 +125,7 @@
                             PlaceholderText="Pick a Artifact"
                             SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedArtifact.Value, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
-                    <StackPanel Margin="5,5,0,5">
+                    <StackPanel Margin="0,5,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*" />
@@ -171,20 +150,22 @@
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="{x:Bind Mode=OneWay, Path=ViewModel.ArtifactCaption.Value}" />
                     </StackPanel>
-                    <StackPanel Margin="5" Orientation="Horizontal">
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                         <Button
                             x:Name="DownloadBlobButton"
+                            Width="150"
                             Command="{x:Bind Path=ViewModel.OnClickDownloadCommand}"
                             Content="Download"
                             IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />
                         <Button
                             x:Name="OpenDownloadFolder"
-                            Margin="10,0,0,0"
+                            Width="150"
+                            Margin="5,0,0,0"
                             Command="{x:Bind Path=ViewModel.OnClickOpenDownloadFolderCommand}"
                             Content="Open Folder" />
                         <TextBlock
                             x:Name="DownloadStatus"
-                            Margin="10"
+                            Margin="5,0,0,0"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="{x:Bind Mode=OneWay, Path=ViewModel.DownloadStatus.Value}" />
                     </StackPanel>

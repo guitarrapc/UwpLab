@@ -27,9 +27,6 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveCommand ShowHideBlobSectionCommand { get; } = new ReactiveCommand();
         public ReactiveProperty<string> ShowHideBlobSectionButtonLabel { get; }
 
-        public ReactiveProperty<Visibility> ShowStorageCredentialVisibility { get; } = new ReactiveProperty<Visibility>(Visibility.Collapsed);
-        public ReactiveCommand ShowHideStorageCredentialsCommand { get; } = new ReactiveCommand();
-        public ReactiveProperty<string> ShowHideStorageCredentialsButtonLabel { get; }
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
@@ -74,17 +71,6 @@ namespace SelectedTextSpeach.ViewModels
             .AddTo(disposable);
 
             // Storage Credential Input
-            ShowHideStorageCredentialsButtonLabel = new ReactiveProperty<string>();
-            ShowHideStorageCredentialsCommand.Subscribe(_ =>
-            {
-                ShowHideStorageCredentialsButtonLabel.Value = ShowStorageCredentialVisibility.Value == Visibility.Collapsed
-                    ? ExpandButtonLabel
-                    : CollapseButtonLabel;
-                ShowStorageCredentialVisibility.Value = ShowStorageCredentialVisibility.Value == Visibility.Collapsed
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-            })
-            .AddTo(disposable);
             StorageConnectionInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("blob_connection_string"));
             StorageConnectionInput.Subscribe(x => blobConnectionUseCase.Save("blob_connection_string", x)).AddTo(disposable);
             StorageContainerInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("container"));
