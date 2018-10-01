@@ -81,7 +81,8 @@
                             x:Name="CheckBlobButton"
                             Width="150"
                             Command="{x:Bind Path=ViewModel.OnClickCheckBlobCommand}"
-                            Content="Get Blob Items" />
+                            Content="Get Blob Items"
+                            IsEnabled="{x:Bind ViewModel.IsEnableCheckBlobButton.Value, Mode=OneWay}" />
                         <Button
                             x:Name="CancelBlobButton"
                             Width="150"

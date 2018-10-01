@@ -25,12 +25,12 @@ namespace SelectedTextSpeach.ViewModels
 
         public ReactiveProperty<Visibility> ShowBlobSectionVisibility { get; } = new ReactiveProperty<Visibility>(Visibility.Visible);
         public ReactiveCommand ShowHideBlobSectionCommand { get; } = new ReactiveCommand();
-        public ReactiveProperty<string> ShowHideBlobSectionButtonLabel { get; }
+        public ReactiveProperty<string> ShowHideBlobSectionButtonLabel { get; } = new ReactiveProperty<string>(ExpandButtonLabel);
 
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
-        public ReactiveProperty<bool> IsDownloadable { get; } = new ReactiveProperty<bool>(true);
+        public ReadOnlyReactiveProperty<bool> IsEnableCheckBlobButton { get; }
         public AsyncReactiveCommand OnClickCheckBlobCommand { get; }
         public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
         public ReactiveCommand OnClickCancelBlobCommand { get; } = new ReactiveCommand();
@@ -58,7 +58,6 @@ namespace SelectedTextSpeach.ViewModels
         public ChoiceArtifactViewModel()
         {
             // Show/Hide Blob
-            ShowHideBlobSectionButtonLabel = new ReactiveProperty<string>();
             ShowHideBlobSectionCommand.Subscribe(_ =>
             {
                 ShowHideBlobSectionButtonLabel.Value = ShowBlobSectionVisibility.Value == Visibility.Collapsed
@@ -113,7 +112,10 @@ namespace SelectedTextSpeach.ViewModels
 
             // Blob Download
             ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
-            OnClickCheckBlobCommand = IsDownloadable.ToAsyncReactiveCommand();
+            IsEnableCheckBlobButton = StorageConnectionInput
+                .CombineLatest(StorageContainerInput, (r, l) => !string.IsNullOrWhiteSpace(r) && !string.IsNullOrWhiteSpace(l))
+                .ToReadOnlyReactiveProperty();
+            OnClickCheckBlobCommand = IsEnableCheckBlobButton.ToAsyncReactiveCommand();
             OnClickCheckBlobCommand.Subscribe(async _ =>
             {
                 var task = blobArtifactUsecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
@@ -125,7 +127,7 @@ namespace SelectedTextSpeach.ViewModels
                 IsCheckBlobCompleted.Value = true;
             })
             .AddTo(disposable);
-            OnClickCancelBlobCommand = IsDownloadable.Select(x => !x).ToReactiveCommand();
+            OnClickCancelBlobCommand = IsEnableCheckBlobButton.Select(x => !x).ToReactiveCommand();
             OnClickCancelBlobCommand.Subscribe(_ => blobArtifactUsecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
