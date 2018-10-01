@@ -181,7 +181,6 @@
     <None Include=".editorconfig" />
     <None Include="README.md" />
     <None Include="Settings.XamlStyler" />
-    <PRIResource Include="resourceFile.resw" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

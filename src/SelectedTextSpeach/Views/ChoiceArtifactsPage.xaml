@@ -49,38 +49,47 @@
                     </Button.RenderTransform>
                 </Button>
             </StackPanel>
-            <StackPanel Margin="10">
-                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage ConnectionString" />
-                <TextBox Margin="5" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Margin="5" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
-                <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <Button
+                    x:Name="showHideCredentials"
+                    Width="26"
+                    Height="26"
+                    Margin="10,0,0,0"
+                    Background="White"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    Command="{x:Bind Path=ViewModel.ShowHideStorageCredentialsCommand}"
+                    Content="{x:Bind ViewModel.ShowHideStorageCredentialsButtonLabel.Value, Mode=OneWay}"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    FontSize="8"
+                    FontWeight="Bold"
+                    ToolTipService.ToolTip="Show or hide the storage credentials" />
+                <StackPanel Margin="10,0,0,0" Visibility="{x:Bind ViewModel.ShowStorageCredentialVisibility.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Blob Storage ConnectionString" />
+                    <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageConnectionInput.Value, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Margin="0,5,0,0" Text="{x:Bind Mode=TwoWay, Path=ViewModel.StorageContainerInput.Value, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="10,5,0,0" Orientation="Horizontal">
                     <Button
                         x:Name="CheckBlobButton"
-                        Margin="10"
+                        Width="150"
                         Command="{x:Bind Path=ViewModel.OnClickCheckBlobCommand}"
-                        Content="Get Blob Items"
-                        IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.IsCheckBoxChecked.Value}" />
-                    <CheckBox
-                        x:Name="CheckBlobButtonCheckBox"
-                        Margin="10"
-                        Content="Enable Blob Button"
-                        IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.IsCheckBoxChecked.Value, UpdateSourceTrigger=PropertyChanged}" />
+                        Content="Get Blob Items" />
                     <Button
                         x:Name="CancelBlobButton"
-                        Margin="10"
+                        Width="150"
+                        Margin="5,0,0,0"
                         Command="{x:Bind Path=ViewModel.OnClickCancelBlobCommand}"
                         Content="Cancel" />
                     <TextBlock
                         x:Name="CheckBlobResult"
-                        Margin="10"
                         Style="{StaticResource CaptionTextBlockStyle}"
                         Text="{x:Bind ViewModel.BlobResult.Value, Mode=OneWay}" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="5" Orientation="Horizontal">
                     <ComboBox
                         x:Name="ProjectComboBox"
-                        Width="200"
-                        Margin="5"
+                        Width="150"
                         DisplayMemberPath="Project"
                         Header="Projects"
                         IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
@@ -89,8 +98,8 @@
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedProject.Value, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         x:Name="BranchComboBox"
-                        Width="200"
-                        Margin="5"
+                        Width="150"
+                        Margin="5,0,0,0"
                         DisplayMemberPath="Branch"
                         Header="Projects"
                         IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
@@ -99,8 +108,8 @@
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedBranch.Value, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         x:Name="ArtifactComboBox"
-                        Width="200"
-                        Margin="5"
+                        Width="150"
+                        Margin="5,0,0,0"
                         DisplayMemberPath="Name"
                         Header="Projects"
                         IsEnabled="{x:Bind Mode=OneWay, Path=ViewModel.ComboBoxEnabled.Value}"
@@ -108,8 +117,8 @@
                         PlaceholderText="Pick a Artifact"
                         SelectedItem="{x:Bind Mode=TwoWay, Path=ViewModel.SelectedArtifact.Value, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
-                <StackPanel>
-                    <Grid Margin="5,5,0,5">
+                <StackPanel Margin="5,5,0,5">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="88" />
@@ -133,23 +142,23 @@
                         Style="{StaticResource CaptionTextBlockStyle}"
                         Text="{x:Bind Mode=OneWay, Path=ViewModel.ArtifactCaption.Value}" />
                 </StackPanel>
-                <StackPanel Margin="10" Orientation="Horizontal">
+                <StackPanel Margin="5" Orientation="Horizontal">
                     <Button
                         x:Name="DownloadBlobButton"
                         Command="{x:Bind Path=ViewModel.OnClickDownloadCommand}"
                         Content="Download"
                         IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />
+                    <Button
+                        x:Name="OpenDownloadFolder"
+                        Margin="10"
+                        Command="{x:Bind Path=ViewModel.OnClickOpenDownloadFolderCommand}"
+                        Content="Open Folder" />
                     <TextBlock
                         x:Name="DownloadStatus"
                         Margin="10"
                         Style="{StaticResource CaptionTextBlockStyle}"
                         Text="{x:Bind Mode=OneWay, Path=ViewModel.DownloadStatus.Value}" />
                 </StackPanel>
-                <Button
-                    x:Name="OpenDownloadFolder"
-                    Margin="10"
-                    Command="{x:Bind Path=ViewModel.OnClickOpenDownloadFolderCommand}"
-                    Content="Open Folder" />
             </StackPanel>
         </StackPanel>
     </Grid>

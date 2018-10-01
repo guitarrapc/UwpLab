@@ -9,22 +9,29 @@ using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
 using SelectedTextSpeach.Models.UseCases;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Xaml;
 
 namespace SelectedTextSpeach.ViewModels
 {
     public class ChoiceArtifactViewModel : IDisposable
     {
+        private static readonly string ExpandButtonLabel = "\xE710";     // + sign
+        private static readonly string CollapseButtonLabel = "\xE738";   // -+ sign
+
         private IBlobArtifactSummary usecase = new BlobArtifactUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
 
+        public ReactiveProperty<Visibility> ShowStorageCredentialVisibility { get; } = new ReactiveProperty<Visibility>(Visibility.Collapsed);
+        public ReactiveCommand ShowHideStorageCredentialsCommand { get; } = new ReactiveCommand();
+        public ReactiveProperty<string> ShowHideStorageCredentialsButtonLabel { get; }
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
-        public ReactiveProperty<bool> IsCheckBoxChecked { get; } = new ReactiveProperty<bool>(true);
+        public ReactiveProperty<bool> IsDownaloadable { get; } = new ReactiveProperty<bool>(true);
         public AsyncReactiveCommand OnClickCheckBlobCommand { get; }
         public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
-        public ReactiveCommand OnClickCancelBlobCommand { get; }
+        public ReactiveCommand OnClickCancelBlobCommand { get; } = new ReactiveCommand();
         public ReactiveProperty<string> BlobResult { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ComboBoxEnabled { get; set; }
 
@@ -48,12 +55,24 @@ namespace SelectedTextSpeach.ViewModels
 
         public ChoiceArtifactViewModel()
         {
-            var resourceLoader = StringsResourcesHelpers.SafeGetForCurrentViewAsync("resourceFile").Result;
-            var blobConnectionString = resourceLoader.GetString("azure_storage_blob_connectionstring");
-            var containerName = resourceLoader.GetString("container_name");
+            // Storage Credential Input
+            var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            var storageSettings = settings.CreateContainer("azureBlobSettings", Windows.Storage.ApplicationDataCreateDisposition.Always);
 
-            StorageConnectionInput = new ReactiveProperty<string>(blobConnectionString);
-            StorageContainerInput = new ReactiveProperty<string>(containerName);
+            ShowHideStorageCredentialsButtonLabel = new ReactiveProperty<string>();
+            ShowHideStorageCredentialsCommand.Subscribe(_ =>
+            {
+                ShowHideStorageCredentialsButtonLabel.Value = ShowStorageCredentialVisibility.Value == Visibility.Collapsed
+                    ? ExpandButtonLabel
+                    : CollapseButtonLabel;
+                ShowStorageCredentialVisibility.Value = ShowStorageCredentialVisibility.Value == Visibility.Collapsed
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }).AddTo(disposable);
+            StorageConnectionInput = new ReactiveProperty<string>((string)storageSettings.Values["blob_connection_string"]);
+            StorageConnectionInput.Subscribe(x => storageSettings.Values["blob_connection_string"] = x).AddTo(disposable);
+            StorageContainerInput = new ReactiveProperty<string>((string)storageSettings.Values["container"]);
+            StorageContainerInput.Subscribe(x => storageSettings.Values["container"] = x).AddTo(disposable);
 
             // Copy Button
             CopyButtonContent = new ReactiveProperty<string>("Copy");
@@ -69,7 +88,7 @@ namespace SelectedTextSpeach.ViewModels
             usecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
             OnClickDownloadCommand = CopyButtonEnabled.ToAsyncReactiveCommand();
             OnClickDownloadCommand
-                .Subscribe(async _ => await usecase.DownloadHoloLensPackagesAsync(blobConnectionString, containerName, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
+                .Subscribe(async _ => await usecase.DownloadHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
                 .AddTo(disposable);
 
             // OpenFolder Button
@@ -92,7 +111,7 @@ namespace SelectedTextSpeach.ViewModels
 
             // Blob Download
             ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
-            OnClickCheckBlobCommand = IsCheckBoxChecked.ToAsyncReactiveCommand();
+            OnClickCheckBlobCommand = IsDownaloadable.ToAsyncReactiveCommand();
             OnClickCheckBlobCommand.Subscribe(async _ =>
             {
                 var task = usecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
@@ -104,7 +123,7 @@ namespace SelectedTextSpeach.ViewModels
                 IsCheckBlobCompleted.Value = true;
             })
             .AddTo(disposable);
-            OnClickCancelBlobCommand = IsCheckBoxChecked.Select(x => !x).ToReactiveCommand();
+            OnClickCancelBlobCommand = IsDownaloadable.Select(x => !x).ToReactiveCommand();
             OnClickCancelBlobCommand.Subscribe(_ => usecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
