@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,15 @@ namespace SelectedTextSpeach.Data.Repositories
             var bytes = new byte[length];
             await blob.DownloadToByteArrayAsync(bytes, 0);
             return bytes;
+        }
+
+        public async Task DownloadBlobArtifactAsync(string containerName, string blobName, Stream stream)
+        {
+            var storageClient = CloudStorageAccount.Parse(blobStorageConnection);
+            var blobClient = storageClient.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(containerName);
+            var blob = container.GetBlockBlobReference(blobName);
+            await blob.DownloadToStreamAsync(stream);
         }
 
         public async Task<IArtifactEntity[]> ListBlobArtifactsAsync(string containerName)

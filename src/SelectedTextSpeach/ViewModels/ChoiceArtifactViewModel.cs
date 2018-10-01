@@ -18,10 +18,14 @@ namespace SelectedTextSpeach.ViewModels
         private static readonly string ExpandButtonLabel = "\xE710";     // + sign
         private static readonly string CollapseButtonLabel = "\xE738";   // - sign
 
-        private IBlobArtifactSummary blobArtifactSummaryUsecase = new BlobArtifactUseCase();
+        private IBlobArtifactSummary blobArtifactUsecase = new BlobArtifactUseCase();
         private IBlobConnectionUseCase blobConnectionUseCase = new BlobConnectionUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
+
+        public ReactiveProperty<Visibility> ShowBlobSectionVisibility { get; } = new ReactiveProperty<Visibility>(Visibility.Visible);
+        public ReactiveCommand ShowHideBlobSectionCommand { get; } = new ReactiveCommand();
+        public ReactiveProperty<string> ShowHideBlobSectionButtonLabel { get; }
 
         public ReactiveProperty<Visibility> ShowStorageCredentialVisibility { get; } = new ReactiveProperty<Visibility>(Visibility.Collapsed);
         public ReactiveCommand ShowHideStorageCredentialsCommand { get; } = new ReactiveCommand();
@@ -29,7 +33,7 @@ namespace SelectedTextSpeach.ViewModels
         public ReactiveProperty<string> StorageConnectionInput { get; }
         public ReactiveProperty<string> StorageContainerInput { get; }
 
-        public ReactiveProperty<bool> IsDownaloadable { get; } = new ReactiveProperty<bool>(true);
+        public ReactiveProperty<bool> IsDownloadable { get; } = new ReactiveProperty<bool>(true);
         public AsyncReactiveCommand OnClickCheckBlobCommand { get; }
         public ReactiveProperty<bool> IsCheckBlobCompleted { get; } = new ReactiveProperty<bool>();
         public ReactiveCommand OnClickCancelBlobCommand { get; } = new ReactiveCommand();
@@ -56,6 +60,19 @@ namespace SelectedTextSpeach.ViewModels
 
         public ChoiceArtifactViewModel()
         {
+            // Show/Hide Blob
+            ShowHideBlobSectionButtonLabel = new ReactiveProperty<string>();
+            ShowHideBlobSectionCommand.Subscribe(_ =>
+            {
+                ShowHideBlobSectionButtonLabel.Value = ShowBlobSectionVisibility.Value == Visibility.Collapsed
+                    ? ExpandButtonLabel
+                    : CollapseButtonLabel;
+                ShowBlobSectionVisibility.Value = ShowBlobSectionVisibility.Value == Visibility.Collapsed
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            })
+            .AddTo(disposable);
+
             // Storage Credential Input
             ShowHideStorageCredentialsButtonLabel = new ReactiveProperty<string>();
             ShowHideStorageCredentialsCommand.Subscribe(_ =>
@@ -66,7 +83,8 @@ namespace SelectedTextSpeach.ViewModels
                 ShowStorageCredentialVisibility.Value = ShowStorageCredentialVisibility.Value == Visibility.Collapsed
                     ? Visibility.Visible
                     : Visibility.Collapsed;
-            }).AddTo(disposable);
+            })
+            .AddTo(disposable);
             StorageConnectionInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("blob_connection_string"));
             StorageConnectionInput.Subscribe(x => blobConnectionUseCase.Save("blob_connection_string", x)).AddTo(disposable);
             StorageContainerInput = new ReactiveProperty<string>(blobConnectionUseCase.Read<string>("container"));
@@ -83,17 +101,17 @@ namespace SelectedTextSpeach.ViewModels
                 .AddTo(disposable);
 
             // Download Button
-            blobArtifactSummaryUsecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
+            blobArtifactUsecase.DownloadStatus.Subscribe(x => DownloadStatus.Value = x).AddTo(disposable);
             OnClickDownloadCommand = CopyButtonEnabled.ToAsyncReactiveCommand();
             OnClickDownloadCommand
-                .Subscribe(async _ => await blobArtifactSummaryUsecase.DownloadHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
+                .Subscribe(async _ => await blobArtifactUsecase.DownloadHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name, SelectedArtifact.Value.Size, SelectedArtifact.Value.FileName))
                 .AddTo(disposable);
 
             // OpenFolder Button
-            OnClickOpenDownloadFolderCommand.Subscribe(_ => blobArtifactSummaryUsecase.OpenFolderAsync()).AddTo(disposable);
+            OnClickOpenDownloadFolderCommand.Subscribe(_ => blobArtifactUsecase.OpenFolderAsync()).AddTo(disposable);
 
             // Initialize by obtain artifact informations
-            blobArtifactSummaryUsecase.Artifacts
+            blobArtifactUsecase.Artifacts
                 .Where(x => x != null)
                 .Do(x =>
                 {
@@ -102,17 +120,17 @@ namespace SelectedTextSpeach.ViewModels
                 })
                 .Subscribe()
                 .AddTo(disposable);
-            blobArtifactSummaryUsecase.RequestFailedMessage
+            blobArtifactUsecase.RequestFailedMessage
                 .Do(x => BlobResult.Value = x)
                 .Subscribe()
                 .AddTo(disposable);
 
             // Blob Download
             ComboBoxEnabled = Projects.CollectionChangedAsObservable().Any().ToReactiveProperty();
-            OnClickCheckBlobCommand = IsDownaloadable.ToAsyncReactiveCommand();
+            OnClickCheckBlobCommand = IsDownloadable.ToAsyncReactiveCommand();
             OnClickCheckBlobCommand.Subscribe(async _ =>
             {
-                var task = blobArtifactSummaryUsecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
+                var task = blobArtifactUsecase.RequestHoloLensPackagesAsync(StorageConnectionInput.Value, StorageContainerInput.Value);
                 Projects.Clear();
                 Branches?.Clear();
                 Artifacts?.Clear();
@@ -121,18 +139,18 @@ namespace SelectedTextSpeach.ViewModels
                 IsCheckBlobCompleted.Value = true;
             })
             .AddTo(disposable);
-            OnClickCancelBlobCommand = IsDownaloadable.Select(x => !x).ToReactiveCommand();
-            OnClickCancelBlobCommand.Subscribe(_ => blobArtifactSummaryUsecase.CancelRequest()).AddTo(disposable);
+            OnClickCancelBlobCommand = IsDownloadable.Select(x => !x).ToReactiveCommand();
+            OnClickCancelBlobCommand.Subscribe(_ => blobArtifactUsecase.CancelRequest()).AddTo(disposable);
 
             // Update Collection with Clear existing collection when selected.
             Branches = SelectedProject.Where(x => x != null)
                 .Do(_ => Branches?.Clear())
                 .Do(_ => Artifacts?.Clear())
-                .SelectMany(x => blobArtifactSummaryUsecase.GetArtifactCache(x.Project))
+                .SelectMany(x => blobArtifactUsecase.GetArtifactCache(x.Project))
                 .ToReactiveCollection();
             Artifacts = SelectedBranch.Where(x => x != null)
                 .Do(x => Artifacts?.Clear())
-                .SelectMany(x => blobArtifactSummaryUsecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
+                .SelectMany(x => blobArtifactUsecase.GetArtifactCache(SelectedProject.Value?.Project, x.Branch))
                 .ToReactiveCollection();
             SelectedArtifact
                 .Where(x => x != null)
@@ -143,10 +161,6 @@ namespace SelectedTextSpeach.ViewModels
                     ArtifactUrl.Value = x.Uri.AbsoluteUri;
                 })
                 .ToReactiveProperty();
-
-            // Next action
-            // TODO : Cancel Download
-            // TODO : Multiple Download?
         }
 
         private IObservable<Unit> TemporaryDisableCopyButtonAsObservable(TimeSpan duration)
