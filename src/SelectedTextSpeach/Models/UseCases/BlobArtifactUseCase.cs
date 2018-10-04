@@ -11,6 +11,7 @@ using Reactive.Bindings;
 using SelectedTextSpeach.Data.Repositories;
 using SelectedTextSpeach.Models.Entities;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
 using Windows.System;
 
 namespace SelectedTextSpeach.Models.UseCases
@@ -21,6 +22,7 @@ namespace SelectedTextSpeach.Models.UseCases
         ReadOnlyReactivePropertySlim<string> RequestFailedMessage { get; }
         ReadOnlyReactivePropertySlim<string> DownloadStatus { get; }
         ReadOnlyReactivePropertySlim<string> DownloadPath { get; }
+        ReactiveProperty<string> CurrentExtractFolderAccessToken { get; }
 
         void CancelRequest();
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
@@ -43,15 +45,17 @@ namespace SelectedTextSpeach.Models.UseCases
         public ReadOnlyReactivePropertySlim<string> DownloadPath => downloadPath.ToReadOnlyReactivePropertySlim();
         private Subject<string> downloadPath = new Subject<string>();
 
+        public ReactiveProperty<string> CurrentExtractFolderAccessToken { get; } = new ReactiveProperty<string>();
         private StorageFolder root;
         private string downloadDirectoryName;
-        private StorageFolder currentExtractFolder = null;
 
         private ConcurrentBag<IArtifactEntity> caches = null;
         private IBlobArtifactRepository repository = null;
 
         public BlobArtifactUseCase(StorageFolder root, string downloadDirectoryName)
         {
+            // ApplicationData.Current.LocalFolder
+            // ApplicationData.Current.TemporaryFolder
             this.root = root;
             this.downloadDirectoryName = downloadDirectoryName;
         }
@@ -112,15 +116,17 @@ namespace SelectedTextSpeach.Models.UseCases
                 // prepare
                 var folder = await ReadyFolderAsync(root, downloadDirectoryName);
                 var parent = Path.GetFileNameWithoutExtension(fileName);
-                currentExtractFolder = await ReadyFolderAsync(folder, parent);
+                var extractFolder = await ReadyFolderAsync(folder, parent);
+                CurrentExtractFolderAccessToken.Value = GetFolderToken(extractFolder);
+                var permittedExtractFoler = await ReadyFolderAsync(CurrentExtractFolderAccessToken.Value);
 
                 // unzip
                 downloadStatusSubject.OnNext("Begin unzip.");
-                Unzip<MemoryStream>(stream, currentExtractFolder);
+                Unzip<MemoryStream>(stream, permittedExtractFoler);
 
                 // notification
                 downloadStatusSubject.OnNext("Complete.");
-                downloadPath.OnNext(currentExtractFolder.Path);
+                downloadPath.OnNext(permittedExtractFoler.Path);
             }
             bytes = null;
         }
@@ -166,8 +172,13 @@ namespace SelectedTextSpeach.Models.UseCases
 
         public async Task OpenDownloadFolderAsync()
         {
-            var folder = currentExtractFolder;
-            if (folder == null)
+            var token = CurrentExtractFolderAccessToken.Value;
+            StorageFolder folder;
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                folder = await ReadyFolderAsync(token);
+            }
+            else
             {
                 folder = await ReadyFolderAsync(root, downloadDirectoryName);
             }
@@ -202,12 +213,24 @@ namespace SelectedTextSpeach.Models.UseCases
             }
         }
 
+        private string GetFolderToken(StorageFolder folder)
+        {
+            var appxFolderToken = StorageApplicationPermissions.FutureAccessList.Add(folder);
+            return appxFolderToken;
+        }
+
         private async Task<StorageFolder> ReadyFolderAsync(StorageFolder root, string directory)
         {
             var folder = Directory.Exists(Path.Combine(root.Path, directory))
                 ? await root.GetFolderAsync(directory)
                 : await root.CreateFolderAsync(directory);
             return folder;
+        }
+
+        private async Task<StorageFolder> ReadyFolderAsync(string folderAccessToken)
+        {
+            var permitFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderAccessToken);
+            return permitFolder;
         }
 
         private void PushCache()
