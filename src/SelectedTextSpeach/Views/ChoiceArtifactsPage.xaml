@@ -141,7 +141,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="88" />
+                                <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
                             <TextBox
                                 x:Name="ArtifactUrl"
@@ -152,7 +152,7 @@
                             <Button
                                 x:Name="Copy"
                                 Grid.Column="1"
-                                Width="88"
+                                Width="150"
                                 Command="{x:Bind ViewModel.OnClickCopyCommand}"
                                 Content="{x:Bind ViewModel.CopyButtonContent.Value, Mode=OneWay}"
                                 IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />

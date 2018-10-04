@@ -21,6 +21,7 @@ namespace SelectedTextSpeach.ViewModels
 
         private IBlobArtifactUseCase blobArtifactUsecase = new BlobArtifactUseCase(ApplicationData.Current.LocalFolder, "tmp");
         private IBlobConnectionUseCase blobConnectionUseCase = new BlobConnectionUseCase();
+        private IBlobSasUrlUseCase blobSasUrlUseCase = new BlobSasUrlUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
 
@@ -81,12 +82,12 @@ namespace SelectedTextSpeach.ViewModels
             StorageContainerInput.Subscribe(x => blobConnectionUseCase.Save("container", x)).AddTo(disposable);
 
             // Copy Button
-            CopyButtonContent = new ReactiveProperty<string>("Copy");
+            CopyButtonContent = new ReactiveProperty<string>("Copy SasUrl");
             CopyButtonEnabled = ArtifactUrl.Select(x => !string.IsNullOrWhiteSpace(x)).ToReactiveProperty();
             OnClickCopyCommand = CopyButtonEnabled.ToReactiveCommand();
             OnClickCopyCommand
-                .Do(_ => ClipboardHelper.CopyToClipboard(ArtifactUrl.Value))
-                .SelectMany(x => TemporaryDisableCopyButtonAsObservable(TimeSpan.FromMilliseconds(500)))
+                .Do(_ => blobSasUrlUseCase.CopySasUrl(ArtifactUrl.Value, StorageConnectionInput.Value, StorageContainerInput.Value, SelectedArtifact.Value.Name))
+                .SelectMany(x => TemporaryDisableCopyButtonAsObservable(TimeSpan.FromMilliseconds(500), "Copy SasUrl"))
                 .Subscribe()
                 .AddTo(disposable);
 
@@ -158,7 +159,7 @@ namespace SelectedTextSpeach.ViewModels
                 .ToReactiveProperty();
         }
 
-        private IObservable<Unit> TemporaryDisableCopyButtonAsObservable(TimeSpan duration)
+        private IObservable<Unit> TemporaryDisableCopyButtonAsObservable(TimeSpan duration, string preserve)
         {
             // Change ButtonContent a while
             return Observable.Start(() =>
@@ -169,7 +170,7 @@ namespace SelectedTextSpeach.ViewModels
             .Delay(duration)
             .Do(__ =>
             {
-                CopyButtonContent.Value = "Copy";
+                CopyButtonContent.Value = preserve;
                 CopyButtonEnabled.Value = true;
             })
             .ToUnit();
