@@ -122,7 +122,7 @@ namespace SelectedTextSpeach.Models.UseCases
 
                 // unzip
                 downloadStatusSubject.OnNext("Begin unzip.");
-                Unzip<MemoryStream>(stream, permittedExtractFoler);
+                await UnzipAsync<MemoryStream>(stream, permittedExtractFoler);
 
                 // notification
                 downloadStatusSubject.OnNext("Complete.");
@@ -131,23 +131,53 @@ namespace SelectedTextSpeach.Models.UseCases
             bytes = null;
         }
 
-        private void Unzip<T>(T stream, StorageFolder extractFolder) where T : Stream
+        private async Task UnzipAsync<T>(T stream, StorageFolder extractFolder) where T : Stream
         {
             // unzip with long name validation
             using (var zip = new ZipArchive(stream, ZipArchiveMode.Read))
             {
                 foreach (var entry in zip.Entries)
                 {
+                    var folders = entry.FullName.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                    var itemPath = entry.Name;
                     // entry.name == "" means it's directory.
-                    if (string.IsNullOrWhiteSpace(entry.Name))
+                    if (string.IsNullOrWhiteSpace(itemPath))
+                    {
+                        // create folder
+                        if (folders.Last() == "Dependencies")
+                        {
+                            await ReadyFolderAsync(extractFolder, "Dependencies");
+                        }
+                        else if (folders.TakeLast(2).SequenceEqual(new[] { "Dependencies", "x86" }))
+                        {
+                            await ReadyFolderAsync(extractFolder, Path.Combine("Dependencies", "x86"));
+                        }
+                        else if (folders.TakeLast(2).SequenceEqual(new[] { "Dependencies", "x64" }))
+                        {
+                            await ReadyFolderAsync(extractFolder, Path.Combine("Dependencies", "x64"));
+                        }
                         continue;
+                    }
+                    else
+                    {
+                        // dependency item's folder path rewrite.
+                        if (folders.SkipLast(1).TakeLast(2).SequenceEqual(new[] { "Dependencies", "x86" }))
+                        {
+                            itemPath = Path.Combine(Path.Combine("Dependencies", "x86"), entry.Name);
+                        }
+                        else if (folders.SkipLast(1).TakeLast(2).SequenceEqual(new[] { "Dependencies", "x64" }))
+                        {
+                            itemPath = Path.Combine(Path.Combine("Dependencies", "x64"), entry.Name);
+                        }
+                    }
 
                     // check file name length is over windows limitation
-                    var path = Path.Combine(extractFolder.Path, entry.Name);
+                    var path = Path.Combine(extractFolder.Path, itemPath);
                     if (path.Length > 280)
                     {
-                        var leastLength = 280 - path.Length - Path.GetExtension(path).Length;
-                        var newpath = string.Join("", Path.GetFileNameWithoutExtension(entry.Name).Take(leastLength).ToArray());
+                        var extension = Path.GetExtension(path);
+                        var leastLength = 280 - path.Length - extension.Length;
+                        var newpath = string.Join("", Path.GetFileNameWithoutExtension(itemPath).Take(leastLength).ToArray()) + extension;
                         downloadStatusSubject.OnNext($"{path} is too long name. {path.Length} length. shorten to {newpath}");
                         path = newpath;
                     }
@@ -160,7 +190,7 @@ namespace SelectedTextSpeach.Models.UseCases
         {
             using (var stream = await file.OpenStreamForReadAsync())
             {
-                Unzip(stream, extractFolder);
+                await UnzipAsync(stream, extractFolder);
             }
         }
 
