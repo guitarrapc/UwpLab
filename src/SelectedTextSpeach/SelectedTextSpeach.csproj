@@ -114,6 +114,7 @@
     <Compile Include="Views\ChoiceArtifactsPage.xaml.cs">
       <DependentUpon>ChoiceArtifactsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Converters\BoolVisibilityConverter.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

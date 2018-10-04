@@ -49,7 +49,8 @@ namespace SelectedTextSpeach.Models.UseCases
         private StorageFolder root;
         private string downloadDirectoryName;
 
-        private ConcurrentBag<IArtifactEntity> caches = null;
+        private ConcurrentBag<IArtifactEntity> caches = new ConcurrentBag<IArtifactEntity>();
+        private ConcurrentBag<IArtifactEntity> current = new ConcurrentBag<IArtifactEntity>();
         private IBlobArtifactRepository repository = null;
 
         public BlobArtifactUseCase(StorageFolder root, string downloadDirectoryName)
@@ -220,16 +221,17 @@ namespace SelectedTextSpeach.Models.UseCases
         {
             try
             {
-                caches = new ConcurrentBag<IArtifactEntity>();
+                current = new ConcurrentBag<IArtifactEntity>();
                 repository = new BlobArtifactRepository(blobConnectionString)
                 {
                     OnGetEachArtifact = artifact =>
                     {
                         blobArtifactSubject.OnNext(artifact);
-                        caches.Add(artifact);
+                        current.Add(artifact);
                     },
                 };
                 var entities = await repository.ListArtifactsAsync(containerName);
+                caches = current;
                 repository = null;
             }
             catch (StorageException ex) when (ex.InnerException is TaskCanceledException)
@@ -268,7 +270,7 @@ namespace SelectedTextSpeach.Models.UseCases
         {
             if (!caches.Any())
                 return;
-            foreach (var cache in caches)
+            foreach (var cache in caches.Reverse())
             {
                 blobArtifactSubject.OnNext(cache);
             }
