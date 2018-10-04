@@ -22,7 +22,7 @@ namespace SelectedTextSpeach.Models.UseCases
         ReadOnlyReactivePropertySlim<string> RequestFailedMessage { get; }
         ReadOnlyReactivePropertySlim<string> DownloadStatus { get; }
         ReadOnlyReactivePropertySlim<string> DownloadPath { get; }
-        ReactiveProperty<string> CurrentExtractFolderAccessToken { get; }
+        ReactiveProperty<string> DownloadFolderAccessToken { get; }
 
         void CancelRequest();
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
@@ -45,7 +45,7 @@ namespace SelectedTextSpeach.Models.UseCases
         public ReadOnlyReactivePropertySlim<string> DownloadPath => downloadPath.ToReadOnlyReactivePropertySlim();
         private Subject<string> downloadPath = new Subject<string>();
 
-        public ReactiveProperty<string> CurrentExtractFolderAccessToken { get; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> DownloadFolderAccessToken { get; } = new ReactiveProperty<string>();
         private StorageFolder root;
         private string downloadDirectoryName;
 
@@ -117,8 +117,8 @@ namespace SelectedTextSpeach.Models.UseCases
                 var folder = await ReadyFolderAsync(root, downloadDirectoryName);
                 var parent = Path.GetFileNameWithoutExtension(fileName);
                 var extractFolder = await ReadyFolderAsync(folder, parent);
-                CurrentExtractFolderAccessToken.Value = GetFolderToken(extractFolder);
-                var permittedExtractFoler = await ReadyFolderAsync(CurrentExtractFolderAccessToken.Value);
+                var accessToken = GetFolderToken(extractFolder);
+                var permittedExtractFoler = await ReadyFolderAsync(accessToken);
 
                 // unzip
                 downloadStatusSubject.OnNext("Begin unzip.");
@@ -127,6 +127,7 @@ namespace SelectedTextSpeach.Models.UseCases
                 // notification
                 downloadStatusSubject.OnNext("Complete.");
                 downloadPath.OnNext(permittedExtractFoler.Path);
+                DownloadFolderAccessToken.Value = accessToken;
             }
             bytes = null;
         }
@@ -202,7 +203,7 @@ namespace SelectedTextSpeach.Models.UseCases
 
         public async Task OpenDownloadFolderAsync()
         {
-            var token = CurrentExtractFolderAccessToken.Value;
+            var token = DownloadFolderAccessToken.Value;
             StorageFolder folder;
             if (!string.IsNullOrWhiteSpace(token))
             {

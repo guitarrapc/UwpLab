@@ -58,7 +58,7 @@ namespace SelectedTextSpeach.ViewModels
         public AsyncReactiveCommand OnClickOpenDownloadBlobFolderCommand { get; } = new AsyncReactiveCommand();
 
         // other view module reference
-        public ReactiveProperty<string> CurrentExtractFolderAccessToken => blobArtifactUsecase.CurrentExtractFolderAccessToken;
+        public ReactiveProperty<string> DownloadFolderAccessToken => blobArtifactUsecase.DownloadFolderAccessToken;
 
         public ChoiceArtifactViewModel()
         {
