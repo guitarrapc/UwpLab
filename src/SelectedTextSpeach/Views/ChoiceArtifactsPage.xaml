@@ -170,6 +170,12 @@
                             Content="Download"
                             IsEnabled="{x:Bind ViewModel.CopyButtonEnabled.Value, Mode=OneWay}" />
                         <Button
+                            x:Name="OpenDownloadBlobFolder"
+                            Width="150"
+                            Margin="5,0,0,0"
+                            Command="{x:Bind Path=ViewModel.OnClickOpenDownloadBlobFolderCommand}"
+                            Content="Open Blob Folder" />
+                        <Button
                             x:Name="OpenDownloadFolder"
                             Width="150"
                             Margin="5,0,0,0"

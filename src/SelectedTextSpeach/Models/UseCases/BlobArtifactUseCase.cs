@@ -15,7 +15,7 @@ using Windows.System;
 
 namespace SelectedTextSpeach.Models.UseCases
 {
-    public interface IBlobArtifactSummary
+    public interface IBlobArtifactUseCase
     {
         ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts { get; }
         ReadOnlyReactivePropertySlim<string> RequestFailedMessage { get; }
@@ -26,12 +26,13 @@ namespace SelectedTextSpeach.Models.UseCases
         Task RequestHoloLensPackagesAsync(string blobConnectionString, string containerName);
         Task DownloadHoloLensPackagesAsync(string blobConnectionString, string containerName, string blobName, long length, string fileName);
         Task OpenFolderAsync();
+        Task OpenDownloadFolderAsync();
         IArtifactEntity[] GetArtifactCache();
         IBranchArtifactEntity[] GetArtifactCache(string projectName);
         IArtifactDetailEntity[] GetArtifactCache(string projectName, string branchNam);
     }
 
-    public class BlobArtifactUseCase : IBlobArtifactSummary
+    public class BlobArtifactUseCase : IBlobArtifactUseCase
     {
         public ReadOnlyReactivePropertySlim<IArtifactEntity> Artifacts => blobArtifactSubject.ToReadOnlyReactivePropertySlim();
         private Subject<IArtifactEntity> blobArtifactSubject = new Subject<IArtifactEntity>();
@@ -42,9 +43,18 @@ namespace SelectedTextSpeach.Models.UseCases
         public ReadOnlyReactivePropertySlim<string> DownloadPath => downloadPath.ToReadOnlyReactivePropertySlim();
         private Subject<string> downloadPath = new Subject<string>();
 
+        private StorageFolder root;
+        private string downloadDirectoryName;
+        private StorageFolder currentExtractFolder = null;
+
         private ConcurrentBag<IArtifactEntity> caches = null;
-        private BlobArtifactRepository repository = null;
-        private static readonly string downloadDirectoryName = "tmp";
+        private IBlobArtifactRepository repository = null;
+
+        public BlobArtifactUseCase(StorageFolder root, string downloadDirectoryName)
+        {
+            this.root = root;
+            this.downloadDirectoryName = downloadDirectoryName;
+        }
 
         public void CancelRequest()
         {
@@ -63,10 +73,10 @@ namespace SelectedTextSpeach.Models.UseCases
 
             // download
             downloadStatusSubject.OnNext("Start downloading.");
-            var result = await repository.DownloadBlobArtifactAsync(containerName, blobName, length);
+            var result = await repository.DownloadArtifactAsync(containerName, blobName, length);
 
             // prepare
-            var folder = await ReadyFolderAsync(ApplicationData.Current.LocalFolder, downloadDirectoryName);
+            var folder = await ReadyFolderAsync(root, downloadDirectoryName);
             var file = await folder.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
 
             // write file
@@ -97,20 +107,20 @@ namespace SelectedTextSpeach.Models.UseCases
             {
                 // download
                 downloadStatusSubject.OnNext("Start downloading.");
-                await repository.DownloadBlobArtifactAsync(containerName, blobName, stream);
+                await repository.DownloadArtifactAsync(containerName, blobName, stream);
 
                 // prepare
-                var folder = await ReadyFolderAsync(ApplicationData.Current.LocalFolder, downloadDirectoryName);
+                var folder = await ReadyFolderAsync(root, downloadDirectoryName);
                 var parent = Path.GetFileNameWithoutExtension(fileName);
-                var extractFolder = await ReadyFolderAsync(folder, parent);
+                currentExtractFolder = await ReadyFolderAsync(folder, parent);
 
                 // unzip
                 downloadStatusSubject.OnNext("Begin unzip.");
-                Unzip<MemoryStream>(stream, extractFolder);
+                Unzip<MemoryStream>(stream, currentExtractFolder);
 
                 // notification
                 downloadStatusSubject.OnNext("Complete.");
-                downloadPath.OnNext(extractFolder.Path);
+                downloadPath.OnNext(currentExtractFolder.Path);
             }
             bytes = null;
         }
@@ -150,7 +160,17 @@ namespace SelectedTextSpeach.Models.UseCases
 
         public async Task OpenFolderAsync()
         {
-            var folder = ApplicationData.Current.LocalFolder;
+            var folder = await ReadyFolderAsync(root, downloadDirectoryName);
+            await Launcher.LaunchFolderAsync(folder);
+        }
+
+        public async Task OpenDownloadFolderAsync()
+        {
+            var folder = currentExtractFolder;
+            if (folder == null)
+            {
+                folder = await ReadyFolderAsync(root, downloadDirectoryName);
+            }
             await Launcher.LaunchFolderAsync(folder);
         }
 
@@ -167,7 +187,7 @@ namespace SelectedTextSpeach.Models.UseCases
                         caches.Add(artifact);
                     },
                 };
-                var entities = await repository.ListBlobArtifactsAsync(containerName);
+                var entities = await repository.ListArtifactsAsync(containerName);
                 repository = null;
             }
             catch (StorageException ex) when (ex.InnerException is TaskCanceledException)

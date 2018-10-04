@@ -9,6 +9,7 @@ using Reactive.Bindings.Extensions;
 using SelectedTextSpeach.Models.Entities;
 using SelectedTextSpeach.Models.UseCases;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace SelectedTextSpeach.ViewModels
@@ -18,7 +19,7 @@ namespace SelectedTextSpeach.ViewModels
         private static readonly string ExpandButtonLabel = "\xE710";     // + sign
         private static readonly string CollapseButtonLabel = "\xE738";   // - sign
 
-        private IBlobArtifactSummary blobArtifactUsecase = new BlobArtifactUseCase();
+        private IBlobArtifactUseCase blobArtifactUsecase = new BlobArtifactUseCase(ApplicationData.Current.LocalFolder, "tmp");
         private IBlobConnectionUseCase blobConnectionUseCase = new BlobConnectionUseCase();
         private CompositeDisposable disposable = new CompositeDisposable();
         private DataPackage dataPackage = new DataPackage();
@@ -54,6 +55,7 @@ namespace SelectedTextSpeach.ViewModels
         public AsyncReactiveCommand OnClickDownloadCommand { get; }
         public ReactiveProperty<string> DownloadStatus { get; } = new ReactiveProperty<string>();
         public AsyncReactiveCommand OnClickOpenDownloadFolderCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand OnClickOpenDownloadBlobFolderCommand { get; } = new AsyncReactiveCommand();
 
         public ChoiceArtifactViewModel()
         {
@@ -94,6 +96,7 @@ namespace SelectedTextSpeach.ViewModels
 
             // OpenFolder Button
             OnClickOpenDownloadFolderCommand.Subscribe(_ => blobArtifactUsecase.OpenFolderAsync()).AddTo(disposable);
+            OnClickOpenDownloadBlobFolderCommand.Subscribe(_ => blobArtifactUsecase.OpenDownloadFolderAsync()).AddTo(disposable);
 
             // Initialize by obtain artifact informations
             blobArtifactUsecase.Artifacts
